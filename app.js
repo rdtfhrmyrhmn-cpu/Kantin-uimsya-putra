@@ -6,7 +6,7 @@ let currentUser = null
 let currentProfile = null
 
 function usernameToEmail(username) {
-  return `${username.toLowerCase().replace(/[^a-z0-9._-]/g, '')}@kantin-uimsya.local`
+  return `${username.toLowerCase().replace(/[^a-z0-9._-]/g, '')}@kantinuimsya.com`
 }
 
 async function requireSession() {

@@ -19,26 +19,22 @@ h1{margin:0 0 8px;font-size:22px}p{color:#64748b;font-size:13px;line-height:1.6}
 <div class="group"><label>USERNAME</label><input id="u" value="admin" autocomplete="username"></div>
 <div class="group"><label>PASSWORD</label><input id="p" type="password" value="admin123" autocomplete="new-password"></div>
 <button class="btn" onclick="createAccount()">Buat Akun</button>
-<p style="font-size:11px">Username akan dipetakan ke email internal <code>@kantin-uimsya.local</code>. Tidak perlu email pengguna.</p>
+<p style="font-size:11px">Username disimpan sebagai identitas login. Tidak ada email verifikasi yang dikirim.</p>
 </div>
 <script>
-const client=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
-function msg(t,ok=false){const e=document.getElementById('msg');e.textContent=t;e.style.display='block';e.className='msg'+(ok?' ok':'')}
 async function createAccount(){
- const u=document.getElementById('u').value.trim(),p=document.getElementById('p').value
+ const u=document.getElementById('u').value.trim().toLowerCase(), p=document.getElementById('p').value
  if(u.length<3)return msg('Username minimal 3 karakter.')
  if(p.length<6)return msg('Password minimal 6 karakter.')
- const email=u.toLowerCase().replace(/[^a-z0-9._-]/g,'')+'@kantin-uimsya.local'
- const {data,error}=await client.auth.signUp({email,password:p})
- if(error)return msg(error.message)
- if(data.session){
-   const {data:claim,error:claimError}=await client.rpc('claim_first_admin')
-   if(claimError)return msg('Akun berhasil dibuat, tetapi gagal menjadikannya admin: '+claimError.message)
-   if(claim===false)return msg('Akun dibuat, tetapi sudah ada admin. Gunakan akun admin yang ada untuk membuat akun lain.',false)
-   msg('✅ Akun admin berhasil dibuat. Silakan buka login.html.',true);
-   await client.auth.signOut()
-  }
- else msg('Akun dibuat, tetapi Supabase meminta konfirmasi email. Matikan Confirm email di Authentication > Providers > Email, lalu ulangi.',false)
+ const btn=document.querySelector('.btn'); btn.disabled=true; btn.textContent='Membuat akun…'
+ try {
+   const res=await fetch('/.netlify/functions/bootstrap-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})})
+   const data=await res.json().catch(()=>({}))
+   if(!res.ok) return msg(data.error || 'Gagal membuat akun.')
+   msg('✅ Akun admin berhasil dibuat. Silakan buka login.html.',true)
+ } catch(e) { msg('Tidak dapat terhubung ke server Netlify. Pastikan site sudah di-deploy ulang.') }
+ finally { btn.disabled=false; btn.textContent='Buat Akun' }
 }
+function msg(t,ok=false){const e=document.getElementById('msg');e.textContent=t;e.style.display='block';e.className='msg'+(ok?' ok':'')}
 </script>
 </body></html>

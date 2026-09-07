@@ -51,3 +51,7 @@ Akun baru langsung aktif dan bisa login menggunakan username + password. Admin t
 - Hanya role `admin` yang boleh memanggil fungsi pembuatan akun.
 - Service role key hanya berada di Environment Variables Netlify.
 - Jangan commit atau membagikan service role key.
+
+
+## Perbaikan v8
+Setup admin sekarang memakai Netlify Function + service role di server, sehingga tidak memanggil signUp/email verification dan tidak memicu email rate limit.
