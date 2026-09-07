@@ -1,0 +1,6 @@
+{
+  "name": "kantin-uimsya-putra-web",
+  "private": true,
+  "version": "7.0.0",
+  "dependencies": { "@supabase/supabase-js": "^2.57.4" }
+}

@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let currentUser = null
+let currentProfile = null
 
 function usernameToEmail(username) {
   return `${username.toLowerCase().replace(/[^a-z0-9._-]/g, '')}@kantin-uimsya.local`
@@ -15,6 +16,8 @@ async function requireSession() {
     throw new Error('AUTH_REQUIRED')
   }
   currentUser = data.session.user
+  const { data: profile } = await supabaseClient.from('profiles').select('id,username,role').eq('id', currentUser.id).maybeSingle()
+  currentProfile = profile || { id: currentUser.id, username: currentUser.user_metadata?.username || currentUser.email?.split('@')[0], role: 'user' }
   return currentUser
 }
 
@@ -169,6 +172,49 @@ async function saveDB() {
 }
 
 // ═══════════════════════════════════════════
+// KELOLA AKUN ADMIN
+// ═══════════════════════════════════════════
+async function showModalAdminUsers() {
+  if(currentProfile?.role !== 'admin') return alert('Akses hanya untuk admin.')
+  document.getElementById('modal-title').textContent='Kelola Akun'
+  document.getElementById('modal-body').innerHTML=`
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:11px 13px;margin-bottom:14px;font-size:12px;line-height:1.5;">
+      <b>Admin:</b> ${currentProfile.username || 'admin'}<br>Gunakan menu ini untuk membuat akun pengguna baru. Password minimal 6 karakter.
+    </div>
+    <div class="form-group"><label>Username Baru</label><input id="new-user-name" placeholder="contoh: bendahara" autocomplete="off"></div>
+    <div class="form-group"><label>Password</label><input id="new-user-pass" type="password" placeholder="Minimal 6 karakter" autocomplete="new-password"></div>
+    <div class="form-group"><label>Ulangi Password</label><input id="new-user-pass2" type="password" placeholder="Ulangi password" autocomplete="new-password"></div>
+    <div id="admin-user-msg" style="display:none;border-radius:8px;padding:10px;font-size:12px;margin-bottom:12px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Tutup</button>
+      <button class="btn btn-primary" id="btn-create-user" onclick="createUserFromAdmin()">➕ Buat Akun</button>
+    </div>`
+  openModal()
+}
+
+async function createUserFromAdmin() {
+  if(currentProfile?.role !== 'admin') return
+  const username=document.getElementById('new-user-name').value.trim().toLowerCase()
+  const password=document.getElementById('new-user-pass').value
+  const password2=document.getElementById('new-user-pass2').value
+  const msg=document.getElementById('admin-user-msg'), btn=document.getElementById('btn-create-user')
+  if(!/^[a-z0-9._-]{3,30}$/.test(username)) return setAdminMsg('Username 3–30 karakter: huruf kecil, angka, titik, garis bawah, atau strip.',false)
+  if(password.length<6) return setAdminMsg('Password minimal 6 karakter.',false)
+  if(password!==password2) return setAdminMsg('Konfirmasi password tidak sama.',false)
+  btn.disabled=true; btn.textContent='Membuat akun...'; msg.style.display='none'
+  try {
+    const {data:{session}}=await supabaseClient.auth.getSession()
+    const res=await fetch('/.netlify/functions/create-user',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({username,password})})
+    const result=await res.json()
+    if(!res.ok) throw new Error(result.error || 'Gagal membuat akun.')
+    setAdminMsg(`✅ Akun <b>${username}</b> berhasil dibuat. Pengguna sekarang bisa login.`,true)
+    document.getElementById('new-user-name').value=''; document.getElementById('new-user-pass').value=''; document.getElementById('new-user-pass2').value=''
+  } catch(e) { setAdminMsg(e.message,false) }
+  finally { btn.disabled=false; btn.textContent='➕ Buat Akun' }
+}
+function setAdminMsg(text,ok){const el=document.getElementById('admin-user-msg'); if(!el)return; el.innerHTML=text; el.style.display='block'; el.style.background=ok?'#f0fdf4':'#fef2f2'; el.style.color=ok?'#166534':'#991b1b'; el.style.border=ok?'1px solid #bbf7d0':'1px solid #fecaca'}
+
+// ═══════════════════════════════════════════
 // AKUN
 // ═══════════════════════════════════════════
 async function doLogout() {
@@ -209,6 +255,8 @@ async function gantiPassword() {
 // ═══════════════════════════════════════════
 async function init() {
   await requireSession()
+  const adminBtn=document.getElementById('btn-admin-users')
+  if(adminBtn) adminBtn.style.display=currentProfile?.role==='admin'?'inline-flex':'none'
   try {
     const loaded=await loadRemoteData()
     if(loaded&&typeof loaded==='object'){

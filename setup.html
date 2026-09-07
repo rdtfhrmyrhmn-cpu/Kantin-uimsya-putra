@@ -31,7 +31,13 @@ async function createAccount(){
  const email=u.toLowerCase().replace(/[^a-z0-9._-]/g,'')+'@kantin-uimsya.local'
  const {data,error}=await client.auth.signUp({email,password:p})
  if(error)return msg(error.message)
- if(data.session){msg('✅ Akun berhasil dibuat. Silakan buka login.html.',true);await client.auth.signOut()}
+ if(data.session){
+   const {data:claim,error:claimError}=await client.rpc('claim_first_admin')
+   if(claimError)return msg('Akun berhasil dibuat, tetapi gagal menjadikannya admin: '+claimError.message)
+   if(claim===false)return msg('Akun dibuat, tetapi sudah ada admin. Gunakan akun admin yang ada untuk membuat akun lain.',false)
+   msg('✅ Akun admin berhasil dibuat. Silakan buka login.html.',true);
+   await client.auth.signOut()
+  }
  else msg('Akun dibuat, tetapi Supabase meminta konfirmasi email. Matikan Confirm email di Authentication > Providers > Email, lalu ulangi.',false)
 }
 </script>

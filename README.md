@@ -1,71 +1,53 @@
 # Kantin Uimsya Putra — Web + Supabase + Netlify
 
-Versi ini mengubah aplikasi Electron menjadi **web statis** yang bisa dideploy ke Netlify. Data transaksi tidak lagi disimpan di `transaksi.json`, tetapi di Supabase.
+Versi web siap deploy ke Netlify. Database dan autentikasi menggunakan Supabase.
 
-## Struktur
+## 1. Buat database
 
-- `renderer/login.html` — login
-- `renderer/index.html` — aplikasi utama
-- `renderer/app.js` — logika aplikasi + koneksi Supabase
-- `renderer/supabase-config.js` — isi URL + anon key Supabase
-- `renderer/setup.html` — membuat akun awal
-- `supabase.sql` — tabel + RLS
-- `netlify.toml` — konfigurasi Netlify
+Di Supabase → SQL Editor, jalankan seluruh isi `supabase.sql`.
 
-## 1. Buat database Supabase
+## 2. Konfigurasi frontend
 
-1. Buat project di Supabase.
-2. Buka **SQL Editor**.
-3. Jalankan seluruh isi `supabase.sql`.
-4. Buka **Project Settings > API** dan salin:
-   - Project URL
-   - Publishable/anon key
+Edit `supabase-config.js`:
 
-## 2. Isi konfigurasi
+- `SUPABASE_URL` = Project URL
+- `SUPABASE_ANON_KEY` = Publishable/anon key
 
-Buka `renderer/supabase-config.js`:
+Jangan masukkan `service_role` key ke file frontend.
 
-```js
-const SUPABASE_URL = 'https://PROJECT-REF.supabase.co'
-const SUPABASE_ANON_KEY = 'PASTE_ANON_KEY'
-```
+## 3. Buat admin pertama
 
-Gunakan **anon/publishable key**, jangan pernah memasukkan `service_role` key ke website.
-
-## 3. Buat akun pertama
-
-Sebelum login, buka:
-
-`setup.html`
-
-Isi default:
-- username: `admin`
-- password: `admin123`
-
-Pada Supabase, untuk model username internal ini, buka **Authentication > Providers > Email** lalu matikan **Confirm email**. Setelah akun dibuat, gunakan `login.html`.
-
-> Setelah akun pertama berhasil dibuat, Anda boleh menghapus `setup.html` dari deployment untuk keamanan tambahan.
+1. Pastikan Supabase Authentication → Providers → Email aktif.
+2. Untuk setup username internal tanpa email sungguhan, matikan **Confirm email**.
+3. Buka `setup.html`.
+4. Buat akun pertama, misalnya:
+   - username: `admin`
+   - password: `admin123`
+5. Halaman setup otomatis menjalankan `claim_first_admin()`, sehingga akun pertama menjadi admin.
 
 ## 4. Deploy ke Netlify
 
-### Cara A — Drag & Drop
-Upload folder `keuangan-putra` ke Netlify. File `netlify.toml` sudah mengatur folder publish ke `renderer`.
+Upload folder/ZIP ini sebagai site Netlify.
 
-### Cara B — Git
-Upload isi folder proyek ke repository GitHub, lalu di Netlify pilih repository tersebut. Build command boleh dikosongkan karena aplikasi ini static. Publish directory: `renderer`.
+Di Netlify → Site configuration → Environment variables, tambahkan:
 
-## 5. Keamanan data
+- `SUPABASE_URL` = Project URL
+- `SUPABASE_ANON_KEY` = Publishable/anon key
+- `SUPABASE_SERVICE_ROLE_KEY` = **service_role key dari Supabase**
 
-RLS memastikan setiap akun hanya dapat membaca/menulis baris `finance_data` miliknya sendiri. Data utama disimpan sebagai JSONB sehingga struktur aplikasi lama tetap kompatibel.
+`SUPABASE_SERVICE_ROLE_KEY` hanya digunakan oleh Netlify Function dan TIDAK boleh dimasukkan ke JavaScript frontend.
 
-## 6. Catatan
+## 5. Membuat akun pengguna baru
 
-Aplikasi membutuhkan internet untuk login dan sinkronisasi Supabase. Fitur CSV sekarang mengunduh file langsung dari browser, sedangkan cetak menggunakan dialog print browser.
+Setelah login sebagai admin, tombol **👥 Akun** akan muncul di kanan atas.
 
-### Troubleshooting
+Klik tombol tersebut → masukkan username dan password → **Buat Akun**.
 
-- **Invalid API key** → periksa `supabase-config.js`.
-- **relation finance_data does not exist** → jalankan `supabase.sql`.
-- **Login gagal** → pastikan akun sudah dibuat dan password benar.
-- **Akun dibuat tapi tidak bisa login** → matikan Confirm email jika menggunakan `setup.html`.
-- **Data tidak tersimpan** → cek RLS dan pastikan user sudah login.
+Akun baru langsung aktif dan bisa login menggunakan username + password. Admin tidak perlu lagi membuka Dashboard Supabase untuk membuat akun.
+
+## Catatan keamanan
+
+- RLS membatasi data keuangan berdasarkan `user_id`.
+- Hanya role `admin` yang boleh memanggil fungsi pembuatan akun.
+- Service role key hanya berada di Environment Variables Netlify.
+- Jangan commit atau membagikan service role key.
