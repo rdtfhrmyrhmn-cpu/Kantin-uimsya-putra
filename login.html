@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Login — Kantin Uimsya Putra</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:'Segoe UI',Arial,sans-serif;
+      background:#1a2e1a;
+      height:100vh;
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;
+      user-select:none;
+    }
+
+    .login-wrap{
+      width:360px;
+      animation: fadeIn .4s ease;
+    }
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+    /* LOGO AREA */
+    .logo-area{text-align:center;margin-bottom:28px;}
+    .logo-icon{font-size:48px;margin-bottom:10px;}
+    .logo-nama{font-size:18px;font-weight:700;color:#fff;letter-spacing:.04em;}
+    .logo-alamat{font-size:12px;color:#4a7a4a;margin-top:4px;}
+    .logo-hadist{
+      font-size:10px;color:#3d5c3d;font-style:italic;
+      margin-top:8px;line-height:1.5;
+      padding:0 10px;
+    }
+
+    /* CARD */
+    .card{
+      background:#1e3d1e;
+      border-radius:14px;
+      padding:28px 28px 24px;
+      border:1px solid rgba(255,255,255,0.07);
+      box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    }
+    .card-title{
+      font-size:14px;font-weight:700;color:#e2e8f0;
+      text-align:center;margin-bottom:22px;
+      letter-spacing:.03em;
+    }
+
+    /* FORM */
+    .form-group{margin-bottom:14px;}
+    .form-group label{
+      display:block;font-size:11px;font-weight:600;
+      color:#8a96a8;text-transform:uppercase;letter-spacing:.06em;
+      margin-bottom:6px;
+    }
+    .form-group input{
+      width:100%;padding:11px 14px;
+      background:#1a2e1a;border:1px solid #374151;
+      border-radius:8px;font-size:14px;color:#fff;
+      outline:none;transition:border-color .2s,box-shadow .2s;
+    }
+    .form-group input::placeholder{color:#3d5c3d;}
+    .form-group input:focus{
+      border-color:#86efac;
+      box-shadow:0 0 0 3px rgba(74,222,128,0.12);
+    }
+
+    /* PASS WRAPPER */
+    .pass-wrap{position:relative;}
+    .pass-wrap input{padding-right:44px;}
+    .btn-show{
+      position:absolute;right:12px;top:50%;transform:translateY(-50%);
+      background:none;border:none;color:#4a7a4a;cursor:pointer;
+      font-size:16px;padding:4px;
+    }
+    .btn-show:hover{color:#86efac;}
+
+    /* ALERT */
+    .alert{
+      background:#3d1515;border:1px solid #7f1d1d;
+      color:#fca5a5;border-radius:8px;
+      padding:10px 14px;font-size:12px;
+      margin-bottom:14px;display:none;
+      text-align:center;
+    }
+    .alert.show{display:block;}
+
+    /* BTN LOGIN */
+    .btn-login{
+      width:100%;padding:13px;
+      background:linear-gradient(135deg,#166534,#14532d);
+      color:#fff;font-size:14px;font-weight:700;
+      border:none;border-radius:8px;cursor:pointer;
+      transition:opacity .2s,transform .1s;
+      letter-spacing:.03em;
+      margin-top:4px;
+    }
+    .btn-login:hover{opacity:.9;}
+    .btn-login:active{transform:scale(.98);}
+    .btn-login:disabled{opacity:.5;cursor:not-allowed;}
+
+    /* LOADING */
+    .spinner{
+      display:inline-block;width:14px;height:14px;
+      border:2px solid rgba(255,255,255,0.3);
+      border-top-color:#fff;border-radius:50%;
+      animation:spin .7s linear infinite;
+      margin-right:8px;vertical-align:middle;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .hint{text-align:center;font-size:11px;color:#2d4a2d;margin-top:16px;}
+    .logo-area img{display:block;margin:0 auto 8px;}
+  </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+<div class="login-wrap">
+
+  <div class="logo-area">
+    <div class="logo-icon"><img src="logo.png" alt="Logo Kantin" style="width:60px;height:60px;object-fit:contain;border-radius:12px;"/></div>
+    <div class="logo-nama">KANTIN UIMSYA PUTRA</div>
+    <div class="logo-alamat">Sumberkembang, Banyuwangi</div>
+    <div class="logo-hadist">"Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia lainnya"</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔐 🔐 Masuk ke Aplikasi</div>
+
+    <div class="alert" id="alert-error"></div>
+
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="inp-user" placeholder="Masukkan username" autocomplete="username" autofocus/>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <div class="pass-wrap">
+        <input type="password" id="inp-pass" placeholder="Masukkan password" autocomplete="current-password"/>
+        <button class="btn-show" onclick="togglePass()" id="btn-show" tabindex="-1">👁</button>
+      </div>
+    </div>
+
+    <button class="btn-login" id="btn-login" onclick="doLogin()">Masuk</button>
+
+    <div class="hint">Login pertama kali: admin / admin123</div>
+  </div>
+
+</div>
+
+<script>
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin()
+  })
+
+  function togglePass() {
+    const inp = document.getElementById('inp-pass')
+    const btn = document.getElementById('btn-show')
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈' }
+    else { inp.type = 'password'; btn.textContent = '👁' }
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('alert-error')
+    el.textContent = '⚠️ ' + msg
+    el.classList.add('show')
+  }
+
+  function hideError() {
+    document.getElementById('alert-error').classList.remove('show')
+  }
+
+  function usernameToEmail(username) {
+    return `${username.toLowerCase().replace(/[^a-z0-9._-]/g, '')}@kantin-uimsya.local`
+  }
+
+  async function doLogin() {
+    const username = document.getElementById('inp-user').value.trim()
+    const password = document.getElementById('inp-pass').value
+    const btn = document.getElementById('btn-login')
+
+    if (!username) { showError('Username tidak boleh kosong.'); return }
+    if (!password) { showError('Password tidak boleh kosong.'); return }
+
+    hideError()
+    btn.disabled = true
+    btn.innerHTML = '<span class="spinner"></span> Memeriksa...'
+
+    try {
+      const { error } = await client.auth.signInWithPassword({
+        email: usernameToEmail(username),
+        password
+      })
+
+      if (error) throw error
+
+      btn.innerHTML = '✓ Berhasil! Membuka aplikasi...'
+      window.location.replace('index.html')
+    } catch(e) {
+      showError('Username atau password salah, atau akun belum dibuat di Supabase.')
+      btn.disabled = false
+      btn.innerHTML = 'Masuk'
+      document.getElementById('inp-pass').value = ''
+      document.getElementById('inp-pass').focus()
+    }
+  }
+
+  // Jika sudah login, langsung masuk
+  client.auth.getSession().then(({data}) => {
+    if (data.session) window.location.replace('index.html')
+  })
+</script>
+</body>
+</html>

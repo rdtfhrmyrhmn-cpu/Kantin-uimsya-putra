@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Kantin Uimsya Putra</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-logo-row">
+        <div class="logo-icon"><img src="logo.png" alt="Logo" class="logo-img"/></div>
+        <div class="logo-text">
+          <div class="logo-title">Kantin Uimsya Putra</div>
+        </div>
+      </div>
+      <div class="logo-hadist">"Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia lainnya"</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">LAPORAN</div>
+      <div class="nav-item active" data-tab="harian">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Laporan Harian</span>
+      </div>
+      <div class="nav-item" data-tab="pengeluaran">
+        <span class="nav-icon">📤</span>
+        <span class="nav-label">Pengeluaran</span>
+      </div>
+      <div class="nav-item" data-tab="tabungan">
+        <span class="nav-icon">🏦</span>
+        <span class="nav-label">Tabungan</span>
+      </div>
+
+      <div class="nav-group-label">ANALISIS</div>
+      <div class="nav-item" data-tab="dashboard">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Dashboard Bulanan</span>
+      </div>
+      <div class="nav-item" data-tab="dashboard-kompleks">
+        <span class="nav-icon">📈</span>
+        <span class="nav-label">Dashboard Kompleks</span>
+      </div>
+
+      <div class="nav-group-label">LAINNYA</div>
+      <div class="nav-item" data-tab="ekspor">
+        <span class="nav-icon">🖨️</span>
+        <span class="nav-label">Ekspor &amp; Cetak</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="tgl-display" id="tgl-display"></div>
+      <div class="version">v6.0.0</div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main" id="main-area">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-hamburger" id="btn-hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-title" id="topbar-title">Laporan Harian</div>
+      </div>
+      <div class="topbar-actions">
+        <label class="lbl-sm">Bulan:</label>
+        <select id="sel-bulan" class="select-sm" onchange="onBulanChange()"></select>
+        <select id="sel-tahun" class="select-sm" onchange="onBulanChange()"></select>
+        <button class="btn btn-success btn-sm" onclick="showModalTambah()">➕ Tambah</button>
+        <div class="save-indicator" id="save-indicator">✓ Tersimpan</div>
+        <button class="btn btn-outline btn-sm" onclick="showModalGantiPass()" title="Ganti Password">🔑</button>
+        <button class="btn btn-logout btn-sm" onclick="doLogout()" title="Keluar">⏻ Keluar</button>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- ══ LAPORAN HARIAN ══ -->
+      <section class="tab-section active" id="tab-harian">
+        <div class="card card-table">
+          <div class="tbl-toolbar">
+            <span class="card-title" id="judul-harian">Laporan Harian</span>
+            <div class="toolbar-btns">
+              <button class="btn btn-outline btn-sm" onclick="cetakHarian(false)">🖨️ Cetak</button>
+              <button class="btn btn-outline btn-sm" onclick="eksporHarianCSV(false)">📊 CSV</button>
+            </div>
+          </div>
+          <div class="tbl-scroll">
+            <table class="tbl-main">
+              <thead><tr>
+                <th class="th-tgl">Tanggal</th>
+                <th class="th-num">Pendapatan I</th>
+                <th class="th-num">Pendapatan II</th>
+                <th class="th-num">Titipan I</th>
+                <th class="th-num">Titipan II</th>
+                <th class="th-num">Titipan III</th>
+                <th class="th-num">Tabungan</th>
+                <th class="th-num th-total">TOTAL</th>
+                <th class="th-act"></th>
+              </tr></thead>
+              <tbody id="tbody-harian"></tbody>
+              <tfoot id="tfoot-harian"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ PENGELUARAN ══ -->
+      <section class="tab-section" id="tab-pengeluaran">
+        <div class="card card-table">
+          <div class="tbl-toolbar">
+            <span class="card-title" id="judul-pengeluaran">Pengeluaran</span>
+            <div class="toolbar-btns">
+              <button class="btn btn-outline btn-sm" onclick="cetakPengeluaran(false)">🖨️ Cetak</button>
+              <button class="btn btn-outline btn-sm" onclick="eksporPengeluaranCSV(false)">📊 CSV</button>
+            </div>
+          </div>
+          <div class="tbl-scroll">
+            <table class="tbl-main">
+              <thead><tr>
+                <th class="th-tgl">Tanggal</th>
+                <th style="text-align:left;padding-left:12px">Keterangan</th>
+                <th class="th-num th-total">Total</th>
+                <th class="th-act"></th>
+              </tr></thead>
+              <tbody id="tbody-pengeluaran"></tbody>
+              <tfoot id="tfoot-pengeluaran"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ TABUNGAN ══ -->
+      <section class="tab-section" id="tab-tabungan">
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="card text-center">
+            <div class="metric-label">🏦 Saldo Tabungan</div>
+            <div class="metric-value c-blue" id="tab-saldo-val">Rp0</div>
+            <div class="metric-delta">Total terkumpul</div>
+          </div>
+          <div class="card text-center">
+            <div class="metric-label">➖ Total Penarikan</div>
+            <div class="metric-value c-red" id="tab-tarik-val">Rp0</div>
+            <div class="metric-delta">Semua waktu</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Rekap Tabungan per Bulan</span>
+            </div>
+            <div id="tabungan-rekap"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Riwayat Penarikan</span>
+            </div>
+            <div id="penarikan-list"></div>
+          </div>
+        </div>
+
+        <div class="card card-table">
+          <div class="tbl-toolbar">
+            <span class="card-title">Detail Tabungan Harian (Bulan Ini)</span>
+          </div>
+          <div class="tbl-scroll">
+            <table class="tbl-main">
+              <thead><tr>
+                <th class="th-tgl">Tanggal</th>
+                <th style="text-align:left;padding-left:12px">Hari</th>
+                <th style="text-align:left;padding-left:12px">Keterangan</th>
+                <th class="th-num">Jumlah</th>
+                <th class="th-num th-total">Akumulasi</th>
+              </tr></thead>
+              <tbody id="tbody-tabungan"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ DASHBOARD BULANAN ══ -->
+      <section class="tab-section" id="tab-dashboard">
+        <div class="grid-4" id="metric-cards"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Grafik Pendapatan Bersih Harian</span>
+              <select id="dash-chart-type" onchange="renderDashChart()" class="select-sm">
+                <option value="bar">Batang</option>
+                <option value="line">Garis</option>
+              </select>
+            </div>
+            <div class="chart-wrap-tall"><canvas id="dashChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Pendapatan vs Pengeluaran</span>
+            </div>
+            <div class="chart-wrap-tall"><canvas id="dashChart2"></canvas></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Rata-rata Pendapatan Harian</span></div>
+            <div id="rata-pendapatan"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Rata-rata Pengeluaran Harian</span></div>
+            <div id="rata-pengeluaran"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ DASHBOARD KOMPLEKS ══ -->
+      <section class="tab-section" id="tab-dashboard-kompleks">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <span class="card-title">📈 Ringkasan Keuangan Keseluruhan</span>
+            <div class="toolbar-btns">
+              <button class="btn-period" id="p-3" onclick="setPeriod(3)">3 Bulan</button>
+              <button class="btn-period" id="p-6" onclick="setPeriod(6)">6 Bulan</button>
+              <button class="btn-period active-period" id="p-12" onclick="setPeriod(12)">1 Tahun</button>
+              <button class="btn-period" id="p-24" onclick="setPeriod(24)">2 Tahun</button>
+            </div>
+          </div>
+          <div class="chart-wrap-xl"><canvas id="kompChart1"></canvas></div>
+        </div>
+
+        <div class="grid-4" id="komp-metrics"></div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Laba/Rugi per Bulan</span></div>
+            <div class="chart-wrap-tall"><canvas id="kompChart2"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Tren Tabungan</span></div>
+            <div class="chart-wrap-tall"><canvas id="kompChart3"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card card-table">
+          <div class="tbl-toolbar">
+            <span class="card-title">Rekap Bulanan Lengkap</span>
+          </div>
+          <div class="tbl-scroll">
+            <table class="tbl-main">
+              <thead><tr>
+                <th style="text-align:left;padding-left:12px">Bulan</th>
+                <th class="th-num">Total Pend. Harian</th>
+                <th class="th-num">Pengeluaran</th>
+                <th class="th-num">Tab. Aktif</th>
+                <th class="th-num th-total">Laba Bersih</th>
+              </tr></thead>
+              <tbody id="tbody-komp"></tbody>
+              <tfoot id="tfoot-komp"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ EKSPOR & CETAK ══ -->
+      <section class="tab-section" id="tab-ekspor">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><span class="card-title">Pilih Periode</span></div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <select id="exp-bulan" class="select-sm" style="padding:7px 12px;font-size:13px;"></select>
+            <select id="exp-tahun" class="select-sm" style="padding:7px 12px;font-size:13px;"></select>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="card cetak-card">
+            <div class="cetak-icon-wrap cetak-icon-p">📋</div>
+            <div class="cetak-judul">Laporan Pendapatan</div>
+            <div class="cetak-sub">Rincian harian pendapatan, titipan, tabungan &amp; total bersih</div>
+            <div id="cetak-info-p" class="cetak-info"></div>
+            <div class="cetak-btns">
+              <button class="btn btn-cetak-p" onclick="cetakHarian(true)">🖨️ Cetak Pendapatan</button>
+              <button class="btn btn-ekspor" onclick="eksporHarianCSV(true)">📊 Ekspor CSV</button>
+            </div>
+          </div>
+          <div class="card cetak-card">
+            <div class="cetak-icon-wrap cetak-icon-k">📤</div>
+            <div class="cetak-judul">Laporan Pengeluaran</div>
+            <div class="cetak-sub">Daftar pengeluaran operasional per tanggal dan keterangan</div>
+            <div id="cetak-info-k" class="cetak-info"></div>
+            <div class="cetak-btns">
+              <button class="btn btn-cetak-k" onclick="cetakPengeluaran(true)">🖨️ Cetak Pengeluaran</button>
+              <button class="btn btn-ekspor" onclick="eksporPengeluaranCSV(true)">📊 Ekspor CSV</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Kelola Data</span></div>
+          <button class="btn btn-danger" onclick="resetData()">🗑 Hapus Semua Data</button>
+          <p class="info-text" id="data-info" style="margin-top:10px;"></p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══ MODAL ══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+  <div class="modal-header">
+    <span class="modal-title" id="modal-title">Tambah Data</span>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+  <div class="modal-body" id="modal-body"></div>
+</div>
+
+<!-- AREA CETAK -->
+<div id="print-area"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

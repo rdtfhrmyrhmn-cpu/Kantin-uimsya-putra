@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Setup Akun — Kantin Uimsya Putra</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial;background:#f0fdf4;color:#17251a;min-height:100vh;display:grid;place-items:center}
+.card{width:min(430px,92vw);background:#fff;border:1px solid #dbe8dc;border-radius:18px;padding:28px;box-shadow:0 20px 50px #0001}
+h1{margin:0 0 8px;font-size:22px}p{color:#64748b;font-size:13px;line-height:1.6}.group{margin:14px 0}.group label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}.group input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px}.btn{width:100%;padding:12px;border:0;border-radius:9px;background:#166534;color:#fff;font-weight:700;cursor:pointer}.msg{padding:10px;border-radius:9px;background:#fef2f2;color:#991b1b;font-size:12px;display:none}.ok{background:#f0fdf4;color:#166534}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+</head>
+<body>
+<div class="card">
+<h1>⚙️ Setup Akun Kantin</h1>
+<p>Gunakan halaman ini hanya sekali untuk membuat akun awal. Setelah akun berhasil dibuat, kembali ke <b>login.html</b>.</p>
+<div id="msg" class="msg"></div>
+<div class="group"><label>USERNAME</label><input id="u" value="admin" autocomplete="username"></div>
+<div class="group"><label>PASSWORD</label><input id="p" type="password" value="admin123" autocomplete="new-password"></div>
+<button class="btn" onclick="createAccount()">Buat Akun</button>
+<p style="font-size:11px">Username akan dipetakan ke email internal <code>@kantin-uimsya.local</code>. Tidak perlu email pengguna.</p>
+</div>
+<script>
+const client=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
+function msg(t,ok=false){const e=document.getElementById('msg');e.textContent=t;e.style.display='block';e.className='msg'+(ok?' ok':'')}
+async function createAccount(){
+ const u=document.getElementById('u').value.trim(),p=document.getElementById('p').value
+ if(u.length<3)return msg('Username minimal 3 karakter.')
+ if(p.length<6)return msg('Password minimal 6 karakter.')
+ const email=u.toLowerCase().replace(/[^a-z0-9._-]/g,'')+'@kantin-uimsya.local'
+ const {data,error}=await client.auth.signUp({email,password:p})
+ if(error)return msg(error.message)
+ if(data.session){msg('✅ Akun berhasil dibuat. Silakan buka login.html.',true);await client.auth.signOut()}
+ else msg('Akun dibuat, tetapi Supabase meminta konfirmasi email. Matikan Confirm email di Authentication > Providers > Email, lalu ulangi.',false)
+}
+</script>
+</body></html>
