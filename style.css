@@ -311,3 +311,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;fo
   .p-footer{margin-top:18px;padding-top:8px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;text-align:center;}
   @page{margin:1.5cm;}
 }
+
+/* v9 finance controls */
+.table-search{min-width:180px;padding:7px 10px;border:1px solid #d1d5db;border-radius:7px;font-size:12px;background:#fff;outline:none}
+.table-search:focus{border-color:#6b7280;box-shadow:0 0 0 2px rgba(107,114,128,.08)}
+.status-badge{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.status-open{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}.status-closed{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.audit-row{display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid #eef0f3;font-size:12px}.audit-row:last-child{border-bottom:0}.audit-detail{color:#6b7280;margin-top:3px}.audit-meta{color:#9ca3af;text-align:right;white-space:nowrap}
+@media(max-width:700px){.table-search{min-width:130px;width:100%}.audit-row{display:block}.audit-meta{text-align:left;margin-top:5px}}

@@ -65,7 +65,8 @@ const ALAMAT_TOKO = 'Sumberkembang, Banyuwangi'
 // db.harian    = { [YYYY-MM-DD]: { pendapatan1, pendapatan2, titipan1..3, tabungan } }
 // db.pengeluaran = [ { id, tgl, keterangan, total } ]
 // db.penarikan   = [ { id, tgl, keterangan, jumlah } ]
-let db = { harian:{}, pengeluaran:[], penarikan:[] }
+let db = { harian:{}, pengeluaran:[], penarikan:[], auditLog:[], closedPeriods:[] }
+let tableSearch = { harian:'', pengeluaran:'' }
 let activeBulan = new Date().getMonth() + 1
 let activeTahun = new Date().getFullYear()
 let activePeriod = 12
@@ -157,6 +158,20 @@ function getBulanRange(n) {
   }
   return result
 }
+
+function currentPeriodKey(){ return `${activeTahun}-${String(activeBulan).padStart(2,'0')}` }
+function isClosedPeriod(key=currentPeriodKey()){ return (db.closedPeriods||[]).includes(key) }
+function canWrite(){ return currentProfile?.role==='admin' || !isClosedPeriod() }
+function ensureWritable(action='mengubah data'){
+  if(!canWrite()){ alert(`Periode ${labelBulan(activeBulan,activeTahun)} sudah ditutup. Hubungi admin untuk membuka kembali.`); return false }
+  return true
+}
+function audit(action,detail){
+  if(!db.auditLog) db.auditLog=[]
+  db.auditLog.unshift({id:`${Date.now()}-${Math.random().toString(36).slice(2,7)}`,at:new Date().toISOString(),user:currentProfile?.username||currentUser?.email||'user',role:currentProfile?.role||'user',action,detail})
+  db.auditLog=db.auditLog.slice(0,500)
+}
+function escapeHtml(v){ return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c])) }
 
 async function saveDB() {
   try {
@@ -263,6 +278,8 @@ async function init() {
       db.harian      = loaded.harian      || {}
       db.pengeluaran = loaded.pengeluaran || []
       db.penarikan   = loaded.penarikan   || []
+      db.auditLog    = loaded.auditLog    || []
+      db.closedPeriods = loaded.closedPeriods || []
     }
   } catch(e){ console.error('Gagal memuat data:', e); alert('Gagal memuat data dari Supabase.') }
 
@@ -329,7 +346,7 @@ function updateLabel() {
 // ═══════════════════════════════════════════
 const TAB_NAMES={
   harian:'Laporan Harian', pengeluaran:'Pengeluaran', tabungan:'Tabungan',
-  dashboard:'Dashboard Bulanan', 'dashboard-kompleks':'Dashboard Kompleks', ekspor:'Ekspor & Cetak'
+  dashboard:'Dashboard Bulanan', 'dashboard-kompleks':'Dashboard Kompleks', ekspor:'Ekspor & Cetak', kontrol:'Kontrol & Backup'
 }
 function showTab(tab) {
   document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'))
@@ -343,13 +360,19 @@ function showTab(tab) {
   if(tab==='dashboard')           renderDashboard()
   if(tab==='dashboard-kompleks')  renderDashboardKompleks()
   if(tab==='ekspor')              renderEkspor()
+  if(tab==='kontrol')             renderKontrol()
 }
 
 // ═══════════════════════════════════════════
 // RENDER HARIAN
 // ═══════════════════════════════════════════
 function renderHarian() {
-  const days=getHarianBulan()
+  const days=getHarianBulan().filter(({tgl,row})=>{
+    const q=(tableSearch.harian||'').toLowerCase().trim();
+    if(!q) return true;
+    const text=[labelTgl(tgl), tgl, row&&JSON.stringify(row)].join(' ').toLowerCase();
+    return text.includes(q);
+  })
   const tbody=document.getElementById('tbody-harian')
   const tfoot=document.getElementById('tfoot-harian')
   if(!tbody||!tfoot) return
@@ -381,7 +404,8 @@ function renderHarian() {
 // RENDER PENGELUARAN
 // ═══════════════════════════════════════════
 function renderPengeluaran() {
-  const list=getPengeluaranBulan()
+  const q=(tableSearch.pengeluaran||'').toLowerCase().trim()
+  const list=getPengeluaranBulan().filter(p=>!q || `${p.tgl} ${p.keterangan} ${p.total}`.toLowerCase().includes(q))
   const tbody=document.getElementById('tbody-pengeluaran')
   const tfoot=document.getElementById('tfoot-pengeluaran')
   if(!tbody||!tfoot) return
@@ -860,9 +884,11 @@ function closeModal() { document.getElementById('modal').classList.remove('open'
 // CRUD
 // ═══════════════════════════════════════════
 async function simpanHarian(fixedTgl) {
+  if(!ensureWritable()) return
   const tgl=fixedTgl||document.getElementById('m-tgl')?.value
   if(!tgl){alert('Pilih tanggal.');return}
   if(isJumat(tgl)){alert('Hari Jumat libur.');return}
+  const wasEdit=!!db.harian[tgl]
   db.harian[tgl]={
     pendapatan1:num(document.getElementById('m-p1')?.value),
     pendapatan2:num(document.getElementById('m-p2')?.value),
@@ -871,16 +897,19 @@ async function simpanHarian(fixedTgl) {
     titipan3:num(document.getElementById('m-t3')?.value),
     tabungan:num(document.getElementById('m-tab')?.value),
   }
+  audit(wasEdit?'EDIT_HARIAN':'TAMBAH_HARIAN',`${tgl} — total ${hitungTotal(db.harian[tgl])}`)
   await saveDB(); closeModal(); renderHarian()
 }
 
 async function hapusHarian(tgl) {
+  if(!ensureWritable()) return
   const ok=window.confirm(`Hapus data ${labelTgl(tgl)}?`)
   if(!ok) return
-  delete db.harian[tgl]; await saveDB(); closeModal(); renderHarian()
+  delete db.harian[tgl]; audit('HAPUS_HARIAN',tgl); await saveDB(); closeModal(); renderHarian()
 }
 
 async function simpanPengeluaran() {
+  if(!ensureWritable()) return
   const tgl=document.getElementById('m-tgl-p')?.value
   const tot=num(document.getElementById('m-tot-p')?.value)
   const ket=document.getElementById('m-ket-p')?.value.trim()
@@ -888,17 +917,22 @@ async function simpanPengeluaran() {
   if(!db.pengeluaran) db.pengeluaran=[]
   db.pengeluaran.push({id:Date.now().toString(),tgl,keterangan:ket,total:tot})
   db.pengeluaran.sort((a,b)=>a.tgl.localeCompare(b.tgl))
+  audit('TAMBAH_PENGELUARAN',`${tgl} — ${ket} — ${tot}`)
   await saveDB(); closeModal(); renderPengeluaran()
 }
 
 async function hapusPengeluaran(id) {
+  if(!ensureWritable()) return
   const ok=window.confirm('Hapus pengeluaran ini?')
   if(!ok) return
+  const item=(db.pengeluaran||[]).find(p=>p.id===id)
   db.pengeluaran=(db.pengeluaran||[]).filter(p=>p.id!==id)
+  audit('HAPUS_PENGELUARAN',item?`${item.tgl} — ${item.keterangan} — ${item.total}`:id)
   await saveDB(); renderPengeluaran()
 }
 
 async function simpanPenarikan() {
+  if(!ensureWritable()) return
   const tgl=document.getElementById('m-tarik-tgl')?.value
   const jml=num(document.getElementById('m-tarik-jml')?.value)
   const ket=document.getElementById('m-tarik-ket')?.value.trim()
@@ -908,13 +942,17 @@ async function simpanPenarikan() {
   if(!db.penarikan) db.penarikan=[]
   db.penarikan.push({id:Date.now().toString(),tgl,keterangan:ket,jumlah:jml})
   db.penarikan.sort((a,b)=>a.tgl.localeCompare(b.tgl))
+  audit('TAMBAH_PENARIKAN',`${tgl} — ${ket} — ${jml}`)
   await saveDB(); closeModal(); renderTabungan()
 }
 
 async function hapusPenarikan(id) {
+  if(!ensureWritable()) return
   const ok=window.confirm('Hapus riwayat penarikan ini?')
   if(!ok) return
+  const item=(db.penarikan||[]).find(p=>p.id===id)
   db.penarikan=(db.penarikan||[]).filter(p=>p.id!==id)
+  audit('HAPUS_PENARIKAN',item?`${item.tgl} — ${item.keterangan} — ${item.jumlah}`:id)
   await saveDB(); renderTabungan()
 }
 
@@ -1013,12 +1051,60 @@ function cetakPengeluaran(fromEkspor) {
 }
 
 // ═══════════════════════════════════════════
+// KONTROL, AUDIT, BACKUP & TUTUP BUKU
+// ═══════════════════════════════════════════
+function renderKontrol(){
+  const status=document.getElementById('period-status')
+  if(status){
+    const closed=isClosedPeriod();
+    status.innerHTML=closed
+      ? `<span class="status-badge status-closed">🔒 ${labelBulan(activeBulan,activeTahun)} DITUTUP</span>`
+      : `<span class="status-badge status-open">🟢 ${labelBulan(activeBulan,activeTahun)} TERBUKA</span>`
+  }
+  const closeBtn=document.getElementById('btn-close-period')
+  if(closeBtn){ closeBtn.textContent=isClosedPeriod()?'🔓 Buka Kembali':'🔒 Tutup Periode'; closeBtn.disabled=currentProfile?.role!=='admin' && isClosedPeriod() }
+  const resetBtn=document.getElementById('btn-reset-data'); if(resetBtn) resetBtn.style.display=currentProfile?.role==='admin'?'inline-flex':'none'
+  const info=document.getElementById('control-info'); if(info) info.textContent=`Login: ${currentProfile?.username||'-'} · Role: ${currentProfile?.role||'user'} · ${db.auditLog?.length||0} aktivitas tercatat.`
+  const list=document.getElementById('audit-list'); if(!list) return
+  const rows=(db.auditLog||[]).slice(0,30)
+  list.innerHTML=rows.length?rows.map(a=>`<div class="audit-row"><div><b>${escapeHtml(a.action)}</b><div class="audit-detail">${escapeHtml(a.detail)}</div></div><div class="audit-meta">${escapeHtml(a.user)} · ${new Date(a.at).toLocaleString('id-ID')}</div></div>`).join(''):'<div class="empty">Belum ada aktivitas.</div>'
+}
+function togglePeriod(){
+  if(currentProfile?.role!=='admin') return alert('Hanya admin yang boleh membuka/menutup periode.')
+  const key=currentPeriodKey(), closed=isClosedPeriod(key)
+  if(closed) db.closedPeriods=db.closedPeriods.filter(x=>x!==key)
+  else db.closedPeriods=[...(db.closedPeriods||[]),key]
+  audit(closed?'BUKA_PERIODE':'TUTUP_PERIODE',labelBulan(activeBulan,activeTahun))
+  saveDB().then(renderKontrol)
+}
+function backupData(){
+  const payload={app:'Kantin Uimsya Putra',version:'9.0.0',exportedAt:new Date().toISOString(),user:currentProfile?.username||'',data:db}
+  downloadText(`backup-kantin-uimsya-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(payload,null,2),'application/json;charset=utf-8')
+}
+function restoreData(){
+  const input=document.getElementById('restore-file'); if(input) input.click()
+}
+async function handleRestoreFile(input){
+  const file=input.files?.[0]; if(!file) return
+  try{
+    const raw=JSON.parse(await file.text()); const data=raw.data||raw
+    if(!data || typeof data!=='object' || typeof (data.harian||{})!=='object' || !Array.isArray(data.pengeluaran||[]) || !Array.isArray(data.penarikan||[])) throw new Error('Format backup tidak dikenali.')
+    if(!confirm('Restore akan mengganti data saat ini. Lanjutkan?')) return
+    db={harian:data.harian||{},pengeluaran:data.pengeluaran||[],penarikan:data.penarikan||[],auditLog:data.auditLog||[],closedPeriods:data.closedPeriods||[]}
+    audit('RESTORE_BACKUP',file.name)
+    await saveDB(); alert('✅ Backup berhasil dipulihkan.'); showTab('harian')
+  }catch(e){alert('❌ Backup gagal dipulihkan: '+e.message)} finally{input.value=''}
+}
+function setSearch(type,value){ tableSearch[type]=value; if(type==='harian') renderHarian(); else renderPengeluaran() }
+
+// ═══════════════════════════════════════════
 // RESET
 // ═══════════════════════════════════════════
 async function resetData() {
+  if(currentProfile?.role!=='admin') return alert('Hanya admin yang boleh menghapus semua data.')
   const ok=window.confirm('Hapus SEMUA data? Tidak bisa dibatalkan!')
   if(!ok) return
-  db={harian:{},pengeluaran:[],penarikan:[]}
+  db={harian:{},pengeluaran:[],penarikan:[],auditLog:[],closedPeriods:[]}
   await saveDB(); alert('✅ Semua data dihapus.'); renderHarian(); renderDataInfo()
 }
 

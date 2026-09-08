@@ -53,6 +53,10 @@
         <span class="nav-icon">🖨️</span>
         <span class="nav-label">Ekspor &amp; Cetak</span>
       </div>
+      <div class="nav-item" data-tab="kontrol">
+        <span class="nav-icon">🛡️</span>
+        <span class="nav-label">Kontrol &amp; Backup</span>
+      </div>
     </nav>
 
     <div class="sidebar-bottom">
@@ -88,6 +92,7 @@
           <div class="tbl-toolbar">
             <span class="card-title" id="judul-harian">Laporan Harian</span>
             <div class="toolbar-btns">
+              <input class="table-search" placeholder="🔎 Cari tanggal / nominal..." oninput="setSearch('harian',this.value)" />
               <button class="btn btn-outline btn-sm" onclick="cetakHarian(false)">🖨️ Cetak</button>
               <button class="btn btn-outline btn-sm" onclick="eksporHarianCSV(false)">📊 CSV</button>
             </div>
@@ -118,6 +123,7 @@
           <div class="tbl-toolbar">
             <span class="card-title" id="judul-pengeluaran">Pengeluaran</span>
             <div class="toolbar-btns">
+              <input class="table-search" placeholder="🔎 Cari keterangan..." oninput="setSearch('pengeluaran',this.value)" />
               <button class="btn btn-outline btn-sm" onclick="cetakPengeluaran(false)">🖨️ Cetak</button>
               <button class="btn btn-outline btn-sm" onclick="eksporPengeluaranCSV(false)">📊 CSV</button>
             </div>
@@ -264,6 +270,37 @@
               <tfoot id="tfoot-komp"></tfoot>
             </table>
           </div>
+        </div>
+      </section>
+
+      <!-- ══ KONTROL & BACKUP ══ -->
+      <section class="tab-section" id="tab-kontrol">
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-header"><span class="card-title">🛡️ Kontrol Periode</span></div>
+            <div id="period-status" style="margin-bottom:12px;"></div>
+            <p class="info-text">Periode yang ditutup tidak dapat diubah oleh pengguna. Admin dapat membuka kembali.</p>
+            <button class="btn btn-primary" id="btn-close-period" onclick="togglePeriod()">🔒 Tutup Periode</button>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">💾 Backup &amp; Restore</span></div>
+            <p class="info-text">Simpan salinan seluruh data aplikasi ke file JSON dan pulihkan kapan saja.</p>
+            <div class="toolbar-btns" style="margin-top:12px;">
+              <button class="btn btn-success" onclick="backupData()">⬇️ Backup Data</button>
+              <button class="btn btn-outline" onclick="restoreData()">⬆️ Restore</button>
+              <input id="restore-file" type="file" accept="application/json,.json" style="display:none" onchange="handleRestoreFile(this)"/>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><span class="card-title">🧾 Audit Log</span></div>
+          <div id="audit-list"></div>
+          <div class="info-text" id="control-info" style="margin-top:10px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⚠️ Zona Berbahaya</span></div>
+          <p class="info-text">Penghapusan seluruh data hanya tersedia untuk admin dan tidak dapat dibatalkan.</p>
+          <button class="btn btn-danger" id="btn-reset-data" onclick="resetData()" style="display:none">🗑 Hapus Semua Data</button>
         </div>
       </section>
 

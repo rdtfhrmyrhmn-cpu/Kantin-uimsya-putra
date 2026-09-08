@@ -20,7 +20,7 @@ exports.handler = async (event) => {
   const password = String(body.password || '')
   if (!/^[a-z0-9._-]{3,30}$/.test(username)) return { statusCode: 400, body: JSON.stringify({ error: 'Username 3–30 karakter: huruf kecil, angka, titik, garis bawah, atau strip.' }) }
   if (password.length < 6) return { statusCode: 400, body: JSON.stringify({ error: 'Password minimal 6 karakter.' }) }
-  const email = `${username}@kantin-uimsya.local`
+  const email = `${username}@kantinuimsya.com`
   const { data: created, error: createError } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { username } })
   if (createError) return { statusCode: 400, body: JSON.stringify({ error: createError.message }) }
   const { error: profileUpsertError } = await admin.from('profiles').upsert({ id: created.user.id, username, role: 'user' }, { onConflict: 'id' })

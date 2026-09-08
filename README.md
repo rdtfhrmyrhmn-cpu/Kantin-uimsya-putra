@@ -55,3 +55,6 @@ Akun baru langsung aktif dan bisa login menggunakan username + password. Admin t
 
 ## Perbaikan v8
 Setup admin sekarang memakai Netlify Function + service role di server, sehingga tidak memanggil signUp/email verification dan tidak memicu email rate limit.
+
+## v9 — Kontrol & Backup
+Versi ini menambahkan pencarian transaksi, audit log aktivitas, tutup/buka periode, backup/restore JSON, pembatasan perubahan pada periode yang sudah ditutup, dan zona berbahaya admin-only.
