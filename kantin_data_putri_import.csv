@@ -1,0 +1,48 @@
+﻿record_id,tipe,tgl,data,updated_at
+harian:2026-06-01,harian,2026-06-01,"{""pendI"":1122500,""pendII"":182500,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":100000}",2026-09-06T00:00:00Z
+harian:2026-06-02,harian,2026-06-02,"{""pendI"":1122500,""pendII"":225000,""titipI"":574000,""titipII"":135000,""titipIII"":52000,""tabungan"":50000}",2026-09-06T00:00:00Z
+harian:2026-06-03,harian,2026-06-03,"{""pendI"":1515000,""pendII"":200000,""titipI"":135000,""titipII"":90000,""titipIII"":0,""tabungan"":150000}",2026-09-06T00:00:00Z
+harian:2026-06-04,harian,2026-06-04,"{""pendI"":617000,""pendII"":200000,""titipI"":135000,""titipII"":0,""titipIII"":0,""tabungan"":50000}",2026-09-06T00:00:00Z
+harian:2026-06-05,harian,2026-06-05,"{""pendI"":0,""pendII"":0,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0,""keterangan"":""LIBUR JUMAT""}",2026-09-06T00:00:00Z
+harian:2026-06-06,harian,2026-06-06,"{""pendI"":0,""pendII"":0,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-07,harian,2026-06-07,"{""pendI"":405000,""pendII"":100000,""titipI"":280000,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-08,harian,2026-06-08,"{""pendI"":865000,""pendII"":135000,""titipI"":378000,""titipII"":0,""titipIII"":0,""tabungan"":50000}",2026-09-06T00:00:00Z
+harian:2026-06-09,harian,2026-06-09,"{""pendI"":770000,""pendII"":200000,""titipI"":378000,""titipII"":0,""titipIII"":0,""tabungan"":50000}",2026-09-06T00:00:00Z
+harian:2026-06-10,harian,2026-06-10,"{""pendI"":762000,""pendII"":250000,""titipI"":371000,""titipII"":0,""titipIII"":0,""tabungan"":50000}",2026-09-06T00:00:00Z
+harian:2026-06-11,harian,2026-06-11,"{""pendI"":700000,""pendII"":172000,""titipI"":313500,""titipII"":0,""titipIII"":0,""tabungan"":50000}",2026-09-06T00:00:00Z
+harian:2026-06-12,harian,2026-06-12,"{""pendI"":0,""pendII"":0,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0,""keterangan"":""LIBUR JUMAT""}",2026-09-06T00:00:00Z
+harian:2026-06-13,harian,2026-06-13,"{""pendI"":840000,""pendII"":0,""titipI"":135000,""titipII"":59500,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-14,harian,2026-06-14,"{""pendI"":850000,""pendII"":200000,""titipI"":135000,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-15,harian,2026-06-15,"{""pendI"":1620000,""pendII"":0,""titipI"":524000,""titipII"":135000,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-16,harian,2026-06-16,"{""pendI"":900000,""pendII"":0,""titipI"":135000,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-17,harian,2026-06-17,"{""pendI"":435000,""pendII"":135000,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-18,harian,2026-06-18,"{""pendI"":1300000,""pendII"":160000,""titipI"":135000,""titipII"":127000,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-19,harian,2026-06-19,"{""pendI"":0,""pendII"":0,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0,""keterangan"":""LIBUR JUMAT""}",2026-09-06T00:00:00Z
+harian:2026-06-20,harian,2026-06-20,"{""pendI"":1075000,""pendII"":0,""titipI"":307000,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-21,harian,2026-06-21,"{""pendI"":0,""pendII"":0,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0,""keterangan"":""LIBUR FUNWALK""}",2026-09-06T00:00:00Z
+harian:2026-06-22,harian,2026-06-22,"{""pendI"":1075000,""pendII"":0,""titipI"":135000,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-23,harian,2026-06-23,"{""pendI"":1303000,""pendII"":0,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-24,harian,2026-06-24,"{""pendI"":930000,""pendII"":0,""titipI"":365000,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-25,harian,2026-06-25,"{""pendI"":545000,""pendII"":0,""titipI"":135000,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-26,harian,2026-06-26,"{""pendI"":0,""pendII"":0,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0,""keterangan"":""LIBUR JUMAT""}",2026-09-06T00:00:00Z
+harian:2026-06-27,harian,2026-06-27,"{""pendI"":1600000,""pendII"":0,""titipI"":0,""titipII"":135000,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-28,harian,2026-06-28,"{""pendI"":0,""pendII"":0,""titipI"":0,""titipII"":0,""titipIII"":0,""tabungan"":0,""keterangan"":""LIBUR AHAD LEGI""}",2026-09-06T00:00:00Z
+harian:2026-06-29,harian,2026-06-29,"{""pendI"":1600000,""pendII"":0,""titipI"":193500,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+harian:2026-06-30,harian,2026-06-30,"{""pendI"":850000,""pendII"":0,""titipI"":135000,""titipII"":0,""titipIII"":0,""tabungan"":0}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-01:001,pengeluaran,2026-06-01,"{""jumlah"":1008000,""keterangan"":""KARISMA""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-01:002,pengeluaran,2026-06-01,"{""jumlah"":2932000,""keterangan"":""A.GROSIR""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-01:003,pengeluaran,2026-06-01,"{""jumlah"":200000,""keterangan"":""LISTRIK""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-04:004,pengeluaran,2026-06-04,"{""jumlah"":187000,""keterangan"":""KARISMA""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-08:005,pengeluaran,2026-06-08,"{""jumlah"":1968000,""keterangan"":""A.GROSIR""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-08:006,pengeluaran,2026-06-08,"{""jumlah"":567000,""keterangan"":""ATK""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-09:007,pengeluaran,2026-06-09,"{""jumlah"":434000,""keterangan"":""A.GROSIR""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-11:008,pengeluaran,2026-06-11,"{""jumlah"":696000,""keterangan"":""KARISMA""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-15:009,pengeluaran,2026-06-15,"{""jumlah"":1711500,""keterangan"":""A.GROSIR""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-18:010,pengeluaran,2026-06-18,"{""jumlah"":456000,""keterangan"":""KERTAS B5""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-18:011,pengeluaran,2026-06-18,"{""jumlah"":456000,""keterangan"":""KERTAS B5""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-19:012,pengeluaran,2026-06-19,"{""jumlah"":1443500,""keterangan"":""KARISMA""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-23:013,pengeluaran,2026-06-23,"{""jumlah"":2293500,""keterangan"":""A.GROSIR""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-25:014,pengeluaran,2026-06-25,"{""jumlah"":340000,""keterangan"":""KRUPUK""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-26:015,pengeluaran,2026-06-26,"{""jumlah"":732500,""keterangan"":""KARISMA""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-26:016,pengeluaran,2026-06-26,"{""jumlah"":670500,""keterangan"":""KARISMA""}",2026-09-06T00:00:00Z
+pengeluaran:2026-06-27:017,pengeluaran,2026-06-27,"{""jumlah"":58500,""keterangan"":""KRESEK""}",2026-09-06T00:00:00Z

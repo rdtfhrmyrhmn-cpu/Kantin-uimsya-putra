@@ -346,7 +346,7 @@ function updateLabel() {
 // ═══════════════════════════════════════════
 const TAB_NAMES={
   harian:'Laporan Harian', pengeluaran:'Pengeluaran', tabungan:'Tabungan',
-  dashboard:'Dashboard Bulanan', 'dashboard-kompleks':'Dashboard Kompleks', ekspor:'Ekspor & Cetak', kontrol:'Kontrol & Backup'
+  dashboard:'Dashboard Bulanan', 'dashboard-kompleks':'Dashboard Kompleks', transaksi:'Transaksi', ekspor:'Ekspor & Cetak', kontrol:'Kontrol & Backup'
 }
 function showTab(tab) {
   document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'))
@@ -354,6 +354,7 @@ function showTab(tab) {
   if(el) el.classList.add('active')
   const tt=document.getElementById('topbar-title')
   if(tt) tt.textContent=TAB_NAMES[tab]||tab
+  if(tab==='transaksi')           renderTransactions()
   if(tab==='harian')              renderHarian()
   if(tab==='pengeluaran')         renderPengeluaran()
   if(tab==='tabungan')            renderTabungan()
@@ -1112,3 +1113,56 @@ async function resetData() {
 // START
 // ═══════════════════════════════════════════
 init()
+
+// ═══════════════════════════════════════════
+// V10 — TRANSACTION MANAGEMENT
+// ═══════════════════════════════════════════
+let v10Transactions=[]
+async function loadTransactions(){
+  const {data,error}=await supabaseClient.from('transactions').select('id,transaction_date,transaction_type,description,amount,payment_method,reference_number,status,notes,created_at,approved_at').eq('user_id',currentUser.id).order('transaction_date',{ascending:false}).order('created_at',{ascending:false}).limit(500)
+  if(error){ console.error(error); return [] }
+  v10Transactions=data||[]; return v10Transactions
+}
+function roleCanEdit(){ return ['admin','bendahara','petugas','user'].includes(currentProfile?.role) }
+function trxTypeLabel(t){return ({income:'Pemasukan',expense:'Pengeluaran',withdrawal:'Penarikan',deposit:'Setoran',transfer:'Transfer',adjustment:'Penyesuaian'})[t]||t}
+function trxStatusBadge(s){return `<span class="status-badge ${s==='approved'?'status-open':s==='pending'?'status-warning':'status-closed'}">${s}</span>`}
+async function renderTransactions(){
+  const body=document.getElementById('trx-body'); if(!body) return
+  if(!v10Transactions.length) await loadTransactions()
+  const q=(document.getElementById('trx-search')?.value||'').toLowerCase(), st=document.getElementById('trx-status')?.value||''
+  const rows=v10Transactions.filter(x=>(!st||x.status===st)&&(!q||`${x.description} ${x.transaction_type} ${x.reference_number||''} ${x.amount}`.toLowerCase().includes(q)))
+  const totalIncome=rows.filter(x=>x.transaction_type==='income'&&x.status==='approved').reduce((s,x)=>s+num(x.amount),0)
+  const totalExpense=rows.filter(x=>['expense','withdrawal'].includes(x.transaction_type)&&x.status==='approved').reduce((s,x)=>s+num(x.amount),0)
+  const pending=rows.filter(x=>x.status==='pending').length
+  const k=document.getElementById('trx-kpis'); if(k) k.innerHTML=`<div class="card"><div class="metric-label">Pemasukan</div><div class="metric-value c-green">${fmt(totalIncome)}</div></div><div class="card"><div class="metric-label">Pengeluaran</div><div class="metric-value c-red">${fmt(totalExpense)}</div></div><div class="card"><div class="metric-label">Bersih</div><div class="metric-value">${fmt(totalIncome-totalExpense)}</div></div><div class="card"><div class="metric-label">Menunggu Approval</div><div class="metric-value c-blue">${pending}</div></div>`
+  body.innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.transaction_date)}</td><td style="text-align:left;padding-left:12px"><b>${escapeHtml(x.description)}</b><div class="info-text">${escapeHtml(x.payment_method||'')} ${x.reference_number?'· '+escapeHtml(x.reference_number):''}</div></td><td>${trxTypeLabel(x.transaction_type)}</td><td>${trxStatusBadge(x.status)}</td><td class="td-num">${fmt(x.amount)}</td><td><button class="btn btn-outline btn-sm" onclick="approveTransaction('${x.id}')" ${x.status!=='pending' || !['admin','bendahara'].includes(currentProfile?.role)?'style="display:none"':''}>✓</button> <button class="btn btn-danger btn-sm" onclick="deleteTransaction('${x.id}')" ${!['admin','bendahara'].includes(currentProfile?.role)?'style="display:none"':''}>🗑</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada transaksi.</td></tr>'
+}
+function openTransactionModal(id=''){
+  if(!roleCanEdit()) return alert('Anda tidak memiliki izin menambah transaksi.')
+  const old=id?v10Transactions.find(x=>x.id===id):null
+  document.getElementById('modal-title').textContent=old?'Edit Transaksi':'Tambah Transaksi V10'
+  document.getElementById('modal-body').innerHTML=`<div class="form-group"><label>Tanggal</label><input id="trx-date" type="date" value="${old?.transaction_date||new Date().toISOString().slice(0,10)}"></div><div class="form-group"><label>Tipe</label><select id="trx-type"><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option><option value="withdrawal">Penarikan</option><option value="deposit">Setoran</option><option value="transfer">Transfer</option><option value="adjustment">Penyesuaian</option></select></div><div class="form-group"><label>Keterangan</label><input id="trx-desc" maxlength="160" value="${escapeHtml(old?.description||'')}"></div><div class="form-group"><label>Nominal</label><input id="trx-amount" type="number" min="0" step="1" value="${old?.amount||''}"></div><div class="form-group"><label>Metode Pembayaran</label><select id="trx-method"><option value="cash">Tunai</option><option value="transfer">Transfer</option><option value="other">Lainnya</option></select></div><div class="form-group"><label>Referensi</label><input id="trx-ref" maxlength="80" value="${escapeHtml(old?.reference_number||'')}"></div><div class="form-group"><label>Catatan</label><textarea id="trx-notes" rows="3">${escapeHtml(old?.notes||'')}</textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="saveTransaction('${id}')">💾 Simpan</button></div>`
+  document.getElementById('trx-type').value=old?.transaction_type||'expense'; document.getElementById('trx-method').value=old?.payment_method||'cash'; openModal()
+}
+async function saveTransaction(id=''){
+  const date=document.getElementById('trx-date').value, type=document.getElementById('trx-type').value, desc=document.getElementById('trx-desc').value.trim(), amount=num(document.getElementById('trx-amount').value)
+  if(!date||!desc||amount<=0) return alert('Tanggal, keterangan, dan nominal wajib diisi.')
+  const payload={transaction_date:date,transaction_type:type,description:desc,amount,payment_method:document.getElementById('trx-method').value,reference_number:document.getElementById('trx-ref').value.trim()||null,notes:document.getElementById('trx-notes').value.trim()||null,updated_at:new Date().toISOString()}
+  if(id){const {error}=await supabaseClient.from('transactions').update(payload).eq('id',id); if(error)return alert('Gagal mengubah transaksi: '+error.message); audit('EDIT_TRANSAKSI',desc)}
+  else {payload.user_id=currentUser.id; payload.created_by=currentUser.id; payload.status=['admin','bendahara'].includes(currentProfile?.role)?'approved':'pending'; const {error}=await supabaseClient.from('transactions').insert(payload); if(error)return alert('Gagal menyimpan transaksi: '+error.message); audit('TAMBAH_TRANSAKSI',desc)}
+  await saveDB(); await loadTransactions(); closeModal(); renderTransactions()
+}
+async function approveTransaction(id){
+  if(!['admin','bendahara'].includes(currentProfile?.role)) return alert('Hanya Admin/Bendahara yang dapat menyetujui.')
+  const row=v10Transactions.find(x=>x.id===id); if(!row)return
+  const {error}=await supabaseClient.from('transactions').update({status:'approved',approved_by:currentUser.id,approved_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id)
+  if(error)return alert('Gagal approve: '+error.message)
+  await loadTransactions(); audit('APPROVE_TRANSAKSI',row.description); await saveDB(); renderTransactions()
+}
+async function deleteTransaction(id){
+  if(!['admin','bendahara'].includes(currentProfile?.role)) return alert('Hanya Admin/Bendahara yang dapat menghapus transaksi.')
+  const row=v10Transactions.find(x=>x.id===id); if(!row)return
+  if(!confirm(`Hapus transaksi "${row.description}"?`))return
+  const {error}=await supabaseClient.from('transactions').delete().eq('id',id); if(error)return alert('Gagal menghapus: '+error.message)
+  audit('HAPUS_TRANSAKSI',row.description); await saveDB(); await loadTransactions(); renderTransactions()
+}

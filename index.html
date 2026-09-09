@@ -38,6 +38,9 @@
         <span class="nav-label">Tabungan</span>
       </div>
 
+      <div class="nav-group-label">TRANSAKSI</div>
+      <div class="nav-item" data-tab="transaksi"><span class="nav-icon">💳</span><span class="nav-label">Transaksi</span></div>
+
       <div class="nav-group-label">ANALISIS</div>
       <div class="nav-item" data-tab="dashboard">
         <span class="nav-icon">📊</span>
@@ -61,7 +64,7 @@
 
     <div class="sidebar-bottom">
       <div class="tgl-display" id="tgl-display"></div>
-      <div class="version">v6.0.0</div>
+      <div class="version">v10.0.0</div>
     </div>
   </aside>
 
@@ -189,6 +192,22 @@
               <tbody id="tbody-tabungan"></tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      <!-- ══ TRANSAKSI V10 ══ -->
+      <section class="tab-section" id="tab-transaksi">
+        <div class="card card-table">
+          <div class="tbl-toolbar">
+            <span class="card-title">💳 Manajemen Transaksi</span>
+            <div class="toolbar-btns">
+              <input id="trx-search" class="table-search" placeholder="🔎 Cari transaksi..." oninput="renderTransactions()"/>
+              <select id="trx-status" class="select-sm" onchange="renderTransactions()"><option value="">Semua status</option><option>approved</option><option>pending</option><option>rejected</option><option>cancelled</option></select>
+              <button class="btn btn-success btn-sm" onclick="openTransactionModal()">➕ Transaksi</button>
+            </div>
+          </div>
+          <div class="grid-4" id="trx-kpis" style="margin:12px 0"></div>
+          <div class="tbl-scroll"><table class="tbl-main"><thead><tr><th>Tanggal</th><th style="text-align:left">Keterangan</th><th>Tipe</th><th>Status</th><th class="th-num">Nominal</th><th></th></tr></thead><tbody id="trx-body"></tbody></table></div>
         </div>
       </section>
 

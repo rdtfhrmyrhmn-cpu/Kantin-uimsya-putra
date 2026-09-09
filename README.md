@@ -53,8 +53,21 @@ Akun baru langsung aktif dan bisa login menggunakan username + password. Admin t
 - Jangan commit atau membagikan service role key.
 
 
-## Perbaikan v8
+## Perbaikan v10
 Setup admin sekarang memakai Netlify Function + service role di server, sehingga tidak memanggil signUp/email verification dan tidak memicu email rate limit.
 
-## v9 — Kontrol & Backup
+## v10 — Kontrol & Backup
 Versi ini menambahkan pencarian transaksi, audit log aktivitas, tutup/buka periode, backup/restore JSON, pembatasan perubahan pada periode yang sudah ditutup, dan zona berbahaya admin-only.
+
+
+## V10 Professional Core
+V10 menambahkan modul transaksi terstruktur (`transactions`), kategori, approval status, audit log terpusat, periode tutup buku, serta role dasar admin/bendahara/petugas/viewer.
+
+### Setup V10
+1. Jalankan seluruh `supabase.sql` di Supabase SQL Editor.
+2. Pastikan `SUPABASE_URL` dan `SUPABASE_ANON_KEY` tersedia untuk frontend.
+3. Pastikan `SUPABASE_SERVICE_ROLE_KEY` hanya berada di Netlify Environment Variables untuk Functions.
+4. Deploy ZIP ini ke Netlify.
+5. Setelah login, buka menu **Transaksi** untuk modul transaksi baru.
+
+Data lama v9 tetap dipertahankan; modul transaksi V10 berjalan berdampingan agar upgrade tidak menghapus data lama. Migrasi historis otomatis penuh dapat dilakukan pada tahap berikutnya setelah struktur transaksi divalidasi.

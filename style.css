@@ -319,3 +319,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;fo
 .status-open{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}.status-closed{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
 .audit-row{display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid #eef0f3;font-size:12px}.audit-row:last-child{border-bottom:0}.audit-detail{color:#6b7280;margin-top:3px}.audit-meta{color:#9ca3af;text-align:right;white-space:nowrap}
 @media(max-width:700px){.table-search{min-width:130px;width:100%}.audit-row{display:block}.audit-meta{text-align:left;margin-top:5px}}
+
+/* V10 professional transaction additions */
+.status-warning{background:#fffbeb!important;color:#b45309!important;border:1px solid #fde68a}
+#trx-kpis .card{padding:14px}
+#trx-kpis .metric-value{font-size:21px}
+#tab-transaksi .tbl-main td{vertical-align:middle}
