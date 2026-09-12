@@ -64,7 +64,7 @@
 
     <div class="sidebar-bottom">
       <div class="tgl-display" id="tgl-display"></div>
-      <div class="version">v10.0.0</div>
+      <div class="version">v10.1.0</div>
     </div>
   </aside>
 
@@ -202,8 +202,8 @@
             <span class="card-title">💳 Manajemen Transaksi</span>
             <div class="toolbar-btns">
               <input id="trx-search" class="table-search" placeholder="🔎 Cari transaksi..." oninput="renderTransactions()"/>
-              <select id="trx-status" class="select-sm" onchange="renderTransactions()"><option value="">Semua status</option><option>approved</option><option>pending</option><option>rejected</option><option>cancelled</option></select>
-              <button class="btn btn-success btn-sm" onclick="openTransactionModal()">➕ Transaksi</button>
+              <select id="trx-month" class="select-sm" onchange="renderTransactions()"><option value="">Semua bulan</option></select><select id="trx-status" class="select-sm" onchange="renderTransactions()"><option value="">Semua status</option><option>approved</option><option>pending</option><option>rejected</option><option>cancelled</option></select>
+              <button class="btn btn-outline btn-sm" onclick="migrateLegacyTransactions()" id="btn-migrate-v9" style="display:none">♻️ Migrasi V9</button><button class="btn btn-success btn-sm" onclick="openTransactionModal()">➕ Transaksi</button>
             </div>
           </div>
           <div class="grid-4" id="trx-kpis" style="margin:12px 0"></div>

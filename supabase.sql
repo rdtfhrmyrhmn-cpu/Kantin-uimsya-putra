@@ -179,3 +179,135 @@ alter table public.profiles add constraint profiles_role_check check (role in ('
 insert into public.categories(name,type,icon) values
 ('Penjualan','income','💰'),('Pendapatan Lain','income','📥'),('Belanja','expense','🛒'),('Operasional','expense','⚙️'),('Listrik & Air','expense','💡'),('Transportasi','expense','🚚'),('Perawatan','expense','🔧'),('Lainnya','expense','📦')
 on conflict do nothing;
+
+
+-- ═══════════════════════════════════════════
+-- V10.1 HARDENING / PRODUCTION RULES
+-- ═══════════════════════════════════════════
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists(select 1 from public.profiles where id = auth.uid() and role = 'admin');
+$$;
+grant execute on function public.is_admin() to authenticated;
+
+-- Admin dapat membaca profil seluruh pengguna; user biasa tetap hanya profil sendiri.
+drop policy if exists "Users can read own profile" on public.profiles;
+drop policy if exists "Admin can read all profiles" on public.profiles;
+create policy "Users can read own profile" on public.profiles
+for select to authenticated using (auth.uid() = id);
+create policy "Admin can read all profiles" on public.profiles
+for select to authenticated using (public.is_admin());
+
+-- Kolom audit sumber untuk migrasi legacy tanpa duplikasi.
+alter table public.transactions add column if not exists source_key text;
+create unique index if not exists transactions_source_key_uidx
+on public.transactions(source_key) where source_key is not null;
+
+-- Periode tertutup wajib ditegakkan di database, bukan hanya UI.
+create or replace function public.enforce_open_period_transaction()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  period_key text;
+  actor uuid := auth.uid();
+begin
+  if public.is_admin() then if TG_OP='DELETE' then return old; else return new; end if; end if;
+  period_key := to_char(coalesce(new.transaction_date, old.transaction_date), 'YYYY-MM');
+  if exists(select 1 from public.closed_periods where closed_periods.period_key = period_key) then
+    raise exception 'PERIODE_TERTUTUP:%', period_key using errcode='P0001';
+  end if;
+  if TG_OP='DELETE' then return old; else return new; end if;
+end;
+$$;
+drop trigger if exists transactions_open_period_guard on public.transactions;
+create trigger transactions_open_period_guard
+before insert or update or delete on public.transactions
+for each row execute function public.enforce_open_period_transaction();
+
+-- Audit log otomatis untuk perubahan transaksi.
+create or replace function public.audit_transaction_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.audit_logs(user_id, action, target, target_id, old_value, new_value)
+  values (
+    auth.uid(),
+    case when TG_OP='INSERT' then 'TRANSAKSI_CREATED'
+         when TG_OP='UPDATE' then 'TRANSAKSI_UPDATED'
+         when TG_OP='DELETE' then 'TRANSAKSI_DELETED' end,
+    'transactions',
+    coalesce(new.id, old.id)::text,
+    case when TG_OP='INSERT' then null else to_jsonb(old) end,
+    case when TG_OP='DELETE' then null else to_jsonb(new) end
+  );
+  if TG_OP='DELETE' then return old; else return new; end if;
+end;
+$$;
+drop trigger if exists transactions_audit_trigger on public.transactions;
+create trigger transactions_audit_trigger
+after insert or update or delete on public.transactions
+for each row execute function public.audit_transaction_change();
+
+-- Audit dan transaksi: Admin dapat melihat seluruh data; user tetap terbatas pada miliknya.
+drop policy if exists "Users can read audit logs" on public.audit_logs;
+create policy "Users can read audit logs" on public.audit_logs
+for select to authenticated using (user_id=auth.uid() or public.is_admin());
+
+-- RPC migrasi aman untuk data V9 yang memiliki pengeluaran/penarikan.
+create or replace function public.migrate_legacy_finance_data()
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  f record; item jsonb; n integer := 0; k text; d date; amount numeric; desc_text text;
+begin
+  if not public.is_admin() then raise exception 'Hanya admin yang dapat menjalankan migrasi.'; end if;
+  for f in select user_id, data from public.finance_data loop
+    for item in select * from jsonb_array_elements(coalesce(f.data->'pengeluaran','[]'::jsonb)) loop
+      d := nullif(item->>'tgl','')::date;
+      amount := coalesce((item->>'total')::numeric,0);
+      desc_text := coalesce(item->>'keterangan','Pengeluaran legacy V9');
+      if d is not null and amount > 0 then
+        k := 'v9:pengeluaran:'||f.user_id::text||':'||coalesce(item->>'id', md5(item::text));
+        insert into public.transactions(user_id,transaction_date,transaction_type,description,amount,payment_method,status,source_key,created_by)
+        values(f.user_id,d,'expense',desc_text,amount,'cash','approved',k,f.user_id)
+        on conflict (source_key) do nothing;
+        if found then n := n+1; end if;
+      end if;
+    end loop;
+    for item in select * from jsonb_array_elements(coalesce(f.data->'penarikan','[]'::jsonb)) loop
+      d := nullif(item->>'tgl','')::date;
+      amount := coalesce((item->>'jumlah')::numeric,0);
+      desc_text := coalesce(item->>'keterangan','Penarikan legacy V9');
+      if d is not null and amount > 0 then
+        k := 'v9:penarikan:'||f.user_id::text||':'||coalesce(item->>'id', md5(item::text));
+        insert into public.transactions(user_id,transaction_date,transaction_type,description,amount,payment_method,status,source_key,created_by)
+        values(f.user_id,d,'withdrawal',desc_text,amount,'cash','approved',k,f.user_id)
+        on conflict (source_key) do nothing;
+        if found then n := n+1; end if;
+      end if;
+    end loop;
+  end loop;
+  return n;
+end;
+$$;
+grant execute on function public.migrate_legacy_finance_data() to authenticated;
+
+drop policy if exists "Admin can manage profiles" on public.profiles;
+create policy "Admin can manage profiles" on public.profiles
+for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- Admin/bendahara dapat memproses transaksi, tetapi hanya Admin yang mengelola periode.

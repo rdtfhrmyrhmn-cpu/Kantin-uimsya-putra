@@ -21,6 +21,11 @@ async function requireSession() {
   return currentUser
 }
 
+async function loadClosedPeriods(){
+  const {data,error}=await supabaseClient.from('closed_periods').select('period_key').order('period_key',{ascending:true})
+  if(!error && Array.isArray(data)) db.closedPeriods=data.map(x=>x.period_key)
+}
+
 async function loadRemoteData() {
   const { data, error } = await supabaseClient
     .from('finance_data')
@@ -191,20 +196,36 @@ async function saveDB() {
 // ═══════════════════════════════════════════
 async function showModalAdminUsers() {
   if(currentProfile?.role !== 'admin') return alert('Akses hanya untuk admin.')
-  document.getElementById('modal-title').textContent='Kelola Akun'
+  document.getElementById('modal-title').textContent='Kelola Akun & Role'
   document.getElementById('modal-body').innerHTML=`
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:11px 13px;margin-bottom:14px;font-size:12px;line-height:1.5;">
-      <b>Admin:</b> ${currentProfile.username || 'admin'}<br>Gunakan menu ini untuk membuat akun pengguna baru. Password minimal 6 karakter.
+      <b>Admin:</b> ${escapeHtml(currentProfile.username || 'admin')}<br>Buat akun baru dan tentukan role. Password minimal 6 karakter.
     </div>
     <div class="form-group"><label>Username Baru</label><input id="new-user-name" placeholder="contoh: bendahara" autocomplete="off"></div>
     <div class="form-group"><label>Password</label><input id="new-user-pass" type="password" placeholder="Minimal 6 karakter" autocomplete="new-password"></div>
     <div class="form-group"><label>Ulangi Password</label><input id="new-user-pass2" type="password" placeholder="Ulangi password" autocomplete="new-password"></div>
+    <div class="form-group"><label>Role</label><select id="new-user-role"><option value="user">User</option><option value="bendahara">Bendahara</option><option value="petugas">Petugas</option><option value="viewer">Viewer</option></select></div>
     <div id="admin-user-msg" style="display:none;border-radius:8px;padding:10px;font-size:12px;margin-bottom:12px"></div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal()">Tutup</button>
-      <button class="btn btn-primary" id="btn-create-user" onclick="createUserFromAdmin()">➕ Buat Akun</button>
-    </div>`
+    <div id="admin-user-list" style="margin-top:8px"></div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal()">Tutup</button><button class="btn btn-primary" id="btn-create-user" onclick="createUserFromAdmin()">➕ Buat Akun</button></div>`
   openModal()
+  await renderAdminUserList()
+}
+
+async function renderAdminUserList(){
+  const el=document.getElementById('admin-user-list'); if(!el)return
+  const {data,error}=await supabaseClient.from('profiles').select('id,username,role,created_at').order('created_at',{ascending:true})
+  if(error){el.innerHTML='<div class="info-text">Gagal memuat daftar pengguna.</div>'; return}
+  el.innerHTML=`<div class="card-title" style="margin:12px 0 8px">👥 Pengguna</div><div class="tbl-scroll"><table class="tbl-main"><thead><tr><th>Username</th><th>Role</th><th>Dibuat</th></tr></thead><tbody>${(data||[]).map(u=>`<tr><td style="text-align:left;padding-left:10px"><b>${escapeHtml(u.username)}</b></td><td><select class="select-sm" onchange="changeUserRole('${u.id}',this.value)" ${u.id===currentUser.id?'disabled':''}><option value="admin" ${u.role==='admin'?'selected':''}>Admin</option><option value="bendahara" ${u.role==='bendahara'?'selected':''}>Bendahara</option><option value="petugas" ${u.role==='petugas'?'selected':''}>Petugas</option><option value="viewer" ${u.role==='viewer'?'selected':''}>Viewer</option><option value="user" ${u.role==='user'?'selected':''}>User</option></select></td><td>${escapeHtml((u.created_at||'').slice(0,10))}</td></tr>`).join('')}</tbody></table></div>`
+}
+
+async function changeUserRole(id, role){
+  if(currentProfile?.role!=='admin') return
+  if(id===currentUser.id) return alert('Role akun admin yang sedang login tidak diubah dari menu ini.')
+  if(!['admin','bendahara','petugas','viewer','user'].includes(role)) return
+  const {error}=await supabaseClient.from('profiles').update({role}).eq('id',id)
+  if(error){alert('Gagal mengubah role: '+error.message); return}
+  audit('UBAH_ROLE',`${id} → ${role}`); await saveDB(); await renderAdminUserList()
 }
 
 async function createUserFromAdmin() {
@@ -212,6 +233,7 @@ async function createUserFromAdmin() {
   const username=document.getElementById('new-user-name').value.trim().toLowerCase()
   const password=document.getElementById('new-user-pass').value
   const password2=document.getElementById('new-user-pass2').value
+  const role=document.getElementById('new-user-role').value
   const msg=document.getElementById('admin-user-msg'), btn=document.getElementById('btn-create-user')
   if(!/^[a-z0-9._-]{3,30}$/.test(username)) return setAdminMsg('Username 3–30 karakter: huruf kecil, angka, titik, garis bawah, atau strip.',false)
   if(password.length<6) return setAdminMsg('Password minimal 6 karakter.',false)
@@ -219,11 +241,12 @@ async function createUserFromAdmin() {
   btn.disabled=true; btn.textContent='Membuat akun...'; msg.style.display='none'
   try {
     const {data:{session}}=await supabaseClient.auth.getSession()
-    const res=await fetch('/.netlify/functions/create-user',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({username,password})})
+    const res=await fetch('/.netlify/functions/create-user',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({username,password,role})})
     const result=await res.json()
     if(!res.ok) throw new Error(result.error || 'Gagal membuat akun.')
-    setAdminMsg(`✅ Akun <b>${username}</b> berhasil dibuat. Pengguna sekarang bisa login.`,true)
+    setAdminMsg(`✅ Akun <b>${escapeHtml(username)}</b> berhasil dibuat sebagai <b>${escapeHtml(role)}</b>.`,true)
     document.getElementById('new-user-name').value=''; document.getElementById('new-user-pass').value=''; document.getElementById('new-user-pass2').value=''
+    await renderAdminUserList()
   } catch(e) { setAdminMsg(e.message,false) }
   finally { btn.disabled=false; btn.textContent='➕ Buat Akun' }
 }
@@ -281,6 +304,7 @@ async function init() {
       db.auditLog    = loaded.auditLog    || []
       db.closedPeriods = loaded.closedPeriods || []
     }
+    await loadClosedPeriods()
   } catch(e){ console.error('Gagal memuat data:', e); alert('Gagal memuat data dari Supabase.') }
 
   document.getElementById('tgl-display').textContent =
@@ -1070,13 +1094,20 @@ function renderKontrol(){
   const rows=(db.auditLog||[]).slice(0,30)
   list.innerHTML=rows.length?rows.map(a=>`<div class="audit-row"><div><b>${escapeHtml(a.action)}</b><div class="audit-detail">${escapeHtml(a.detail)}</div></div><div class="audit-meta">${escapeHtml(a.user)} · ${new Date(a.at).toLocaleString('id-ID')}</div></div>`).join(''):'<div class="empty">Belum ada aktivitas.</div>'
 }
-function togglePeriod(){
+async function togglePeriod(){
   if(currentProfile?.role!=='admin') return alert('Hanya admin yang boleh membuka/menutup periode.')
   const key=currentPeriodKey(), closed=isClosedPeriod(key)
-  if(closed) db.closedPeriods=db.closedPeriods.filter(x=>x!==key)
-  else db.closedPeriods=[...(db.closedPeriods||[]),key]
+  if(closed){
+    const {error}=await supabaseClient.from('closed_periods').delete().eq('period_key',key)
+    if(error)return alert('Gagal membuka periode: '+error.message)
+    db.closedPeriods=db.closedPeriods.filter(x=>x!==key)
+  } else {
+    const {error}=await supabaseClient.from('closed_periods').upsert({period_key:key,closed_by:currentUser.id,closed_at:new Date().toISOString()})
+    if(error)return alert('Gagal menutup periode: '+error.message)
+    db.closedPeriods=[...(db.closedPeriods||[]),key]
+  }
   audit(closed?'BUKA_PERIODE':'TUTUP_PERIODE',labelBulan(activeBulan,activeTahun))
-  saveDB().then(renderKontrol)
+  await saveDB(); renderKontrol()
 }
 function backupData(){
   const payload={app:'Kantin Uimsya Putra',version:'9.0.0',exportedAt:new Date().toISOString(),user:currentProfile?.username||'',data:db}
@@ -1119,50 +1150,89 @@ init()
 // ═══════════════════════════════════════════
 let v10Transactions=[]
 async function loadTransactions(){
-  const {data,error}=await supabaseClient.from('transactions').select('id,transaction_date,transaction_type,description,amount,payment_method,reference_number,status,notes,created_at,approved_at').eq('user_id',currentUser.id).order('transaction_date',{ascending:false}).order('created_at',{ascending:false}).limit(500)
+  const isAdmin=currentProfile?.role==='admin'
+  let query=supabaseClient.from('transactions').select('id,user_id,transaction_date,transaction_type,description,amount,payment_method,reference_number,status,notes,created_at,approved_at,profiles(username,role)').order('transaction_date',{ascending:false}).order('created_at',{ascending:false}).limit(1000)
+  if(!isAdmin) query=query.eq('user_id',currentUser.id)
+  const {data,error}=await query
   if(error){ console.error(error); return [] }
   v10Transactions=data||[]; return v10Transactions
 }
 function roleCanEdit(){ return ['admin','bendahara','petugas','user'].includes(currentProfile?.role) }
+function canApprove(){ return ['admin','bendahara'].includes(currentProfile?.role) }
 function trxTypeLabel(t){return ({income:'Pemasukan',expense:'Pengeluaran',withdrawal:'Penarikan',deposit:'Setoran',transfer:'Transfer',adjustment:'Penyesuaian'})[t]||t}
-function trxStatusBadge(s){return `<span class="status-badge ${s==='approved'?'status-open':s==='pending'?'status-warning':'status-closed'}">${s}</span>`}
+function trxStatusBadge(s){return `<span class="status-badge ${s==='approved'?'status-open':s==='pending'?'status-warning':s==='rejected'?'status-closed':'status-closed'}">${escapeHtml(s)}</span>`}
+function setupTransactionFilters(){
+  const sel=document.getElementById('trx-month'); if(!sel)return
+  const current=sel.value
+  const months=[]
+  for(let i=0;i<12;i++){ const d=new Date(); d.setMonth(d.getMonth()-i); const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; months.push(k) }
+  sel.innerHTML='<option value="">Semua bulan</option>'+months.map(k=>`<option value="${k}">${labelBulan(Number(k.slice(5)),Number(k.slice(0,4)))}</option>`).join('')
+  if(current)sel.value=current
+  const mig=document.getElementById('btn-migrate-v9'); if(mig)mig.style.display=currentProfile?.role==='admin'?'inline-flex':'none'
+}
 async function renderTransactions(){
   const body=document.getElementById('trx-body'); if(!body) return
-  if(!v10Transactions.length) await loadTransactions()
+  setupTransactionFilters()
+  await loadTransactions()
   const q=(document.getElementById('trx-search')?.value||'').toLowerCase(), st=document.getElementById('trx-status')?.value||''
-  const rows=v10Transactions.filter(x=>(!st||x.status===st)&&(!q||`${x.description} ${x.transaction_type} ${x.reference_number||''} ${x.amount}`.toLowerCase().includes(q)))
-  const totalIncome=rows.filter(x=>x.transaction_type==='income'&&x.status==='approved').reduce((s,x)=>s+num(x.amount),0)
+  const month=document.getElementById('trx-month')?.value||''
+  const rows=v10Transactions.filter(x=>(!st||x.status===st)&&(!month||x.transaction_date?.startsWith(month))&&(!q||`${x.description} ${x.transaction_type} ${x.reference_number||''} ${x.amount} ${x.profiles?.username||''}`.toLowerCase().includes(q)))
+  const totalIncome=rows.filter(x=>['income','deposit'].includes(x.transaction_type)&&x.status==='approved').reduce((s,x)=>s+num(x.amount),0)
   const totalExpense=rows.filter(x=>['expense','withdrawal'].includes(x.transaction_type)&&x.status==='approved').reduce((s,x)=>s+num(x.amount),0)
   const pending=rows.filter(x=>x.status==='pending').length
   const k=document.getElementById('trx-kpis'); if(k) k.innerHTML=`<div class="card"><div class="metric-label">Pemasukan</div><div class="metric-value c-green">${fmt(totalIncome)}</div></div><div class="card"><div class="metric-label">Pengeluaran</div><div class="metric-value c-red">${fmt(totalExpense)}</div></div><div class="card"><div class="metric-label">Bersih</div><div class="metric-value">${fmt(totalIncome-totalExpense)}</div></div><div class="card"><div class="metric-label">Menunggu Approval</div><div class="metric-value c-blue">${pending}</div></div>`
-  body.innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.transaction_date)}</td><td style="text-align:left;padding-left:12px"><b>${escapeHtml(x.description)}</b><div class="info-text">${escapeHtml(x.payment_method||'')} ${x.reference_number?'· '+escapeHtml(x.reference_number):''}</div></td><td>${trxTypeLabel(x.transaction_type)}</td><td>${trxStatusBadge(x.status)}</td><td class="td-num">${fmt(x.amount)}</td><td><button class="btn btn-outline btn-sm" onclick="approveTransaction('${x.id}')" ${x.status!=='pending' || !['admin','bendahara'].includes(currentProfile?.role)?'style="display:none"':''}>✓</button> <button class="btn btn-danger btn-sm" onclick="deleteTransaction('${x.id}')" ${!['admin','bendahara'].includes(currentProfile?.role)?'style="display:none"':''}>🗑</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada transaksi.</td></tr>'
+  body.innerHTML=rows.length?rows.map(x=>`<tr><td>${escapeHtml(x.transaction_date)}</td><td style="text-align:left;padding-left:12px"><b>${escapeHtml(x.description)}</b><div class="info-text">${escapeHtml(x.profiles?.username||'')} ${escapeHtml(x.payment_method||'')} ${x.reference_number?'· '+escapeHtml(x.reference_number):''}</div></td><td>${trxTypeLabel(x.transaction_type)}</td><td>${trxStatusBadge(x.status)}</td><td class="td-num">${fmt(x.amount)}</td><td><button class="btn btn-outline btn-sm" onclick="openTransactionModal('${x.id}')">✎</button> <button class="btn btn-success btn-sm" onclick="approveTransaction('${x.id}')" ${x.status!=='pending'||!canApprove()?'style="display:none"':''}>✓</button> <button class="btn btn-outline btn-sm" onclick="rejectTransaction('${x.id}')" ${x.status!=='pending'||!canApprove()?'style="display:none"':''}>✕</button> <button class="btn btn-danger btn-sm" onclick="deleteTransaction('${x.id}')" ${!canApprove()?'style="display:none"':''}>🗑</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">Belum ada transaksi.</td></tr>'
 }
 function openTransactionModal(id=''){
   if(!roleCanEdit()) return alert('Anda tidak memiliki izin menambah transaksi.')
   const old=id?v10Transactions.find(x=>x.id===id):null
-  document.getElementById('modal-title').textContent=old?'Edit Transaksi':'Tambah Transaksi V10'
+  if(old && old.user_id!==currentUser.id && currentProfile?.role!=='admin') return alert('Anda tidak dapat mengedit transaksi pengguna lain.')
+  document.getElementById('modal-title').textContent=old?'Edit Transaksi':'Tambah Transaksi V10.1'
   document.getElementById('modal-body').innerHTML=`<div class="form-group"><label>Tanggal</label><input id="trx-date" type="date" value="${old?.transaction_date||new Date().toISOString().slice(0,10)}"></div><div class="form-group"><label>Tipe</label><select id="trx-type"><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option><option value="withdrawal">Penarikan</option><option value="deposit">Setoran</option><option value="transfer">Transfer</option><option value="adjustment">Penyesuaian</option></select></div><div class="form-group"><label>Keterangan</label><input id="trx-desc" maxlength="160" value="${escapeHtml(old?.description||'')}"></div><div class="form-group"><label>Nominal</label><input id="trx-amount" type="number" min="0" step="1" value="${old?.amount||''}"></div><div class="form-group"><label>Metode Pembayaran</label><select id="trx-method"><option value="cash">Tunai</option><option value="transfer">Transfer</option><option value="other">Lainnya</option></select></div><div class="form-group"><label>Referensi</label><input id="trx-ref" maxlength="80" value="${escapeHtml(old?.reference_number||'')}"></div><div class="form-group"><label>Catatan</label><textarea id="trx-notes" rows="3">${escapeHtml(old?.notes||'')}</textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal()">Batal</button><button class="btn btn-primary" onclick="saveTransaction('${id}')">💾 Simpan</button></div>`
   document.getElementById('trx-type').value=old?.transaction_type||'expense'; document.getElementById('trx-method').value=old?.payment_method||'cash'; openModal()
 }
 async function saveTransaction(id=''){
+  if(!ensureWritable('menyimpan transaksi')) return
   const date=document.getElementById('trx-date').value, type=document.getElementById('trx-type').value, desc=document.getElementById('trx-desc').value.trim(), amount=num(document.getElementById('trx-amount').value)
   if(!date||!desc||amount<=0) return alert('Tanggal, keterangan, dan nominal wajib diisi.')
   const payload={transaction_date:date,transaction_type:type,description:desc,amount,payment_method:document.getElementById('trx-method').value,reference_number:document.getElementById('trx-ref').value.trim()||null,notes:document.getElementById('trx-notes').value.trim()||null,updated_at:new Date().toISOString()}
-  if(id){const {error}=await supabaseClient.from('transactions').update(payload).eq('id',id); if(error)return alert('Gagal mengubah transaksi: '+error.message); audit('EDIT_TRANSAKSI',desc)}
-  else {payload.user_id=currentUser.id; payload.created_by=currentUser.id; payload.status=['admin','bendahara'].includes(currentProfile?.role)?'approved':'pending'; const {error}=await supabaseClient.from('transactions').insert(payload); if(error)return alert('Gagal menyimpan transaksi: '+error.message); audit('TAMBAH_TRANSAKSI',desc)}
+  if(id){
+    const row=v10Transactions.find(x=>x.id===id); if(!row)return
+    if(row.user_id!==currentUser.id && currentProfile?.role!=='admin') return alert('Tidak diizinkan.')
+    const {error}=await supabaseClient.from('transactions').update(payload).eq('id',id); if(error)return alert('Gagal mengubah transaksi: '+error.message); audit('EDIT_TRANSAKSI',desc)
+  } else {
+    payload.user_id=currentUser.id; payload.created_by=currentUser.id; payload.status=canApprove()?'approved':'pending'
+    const {error}=await supabaseClient.from('transactions').insert(payload); if(error)return alert('Gagal menyimpan transaksi: '+error.message); audit('TAMBAH_TRANSAKSI',desc)
+  }
   await saveDB(); await loadTransactions(); closeModal(); renderTransactions()
 }
 async function approveTransaction(id){
-  if(!['admin','bendahara'].includes(currentProfile?.role)) return alert('Hanya Admin/Bendahara yang dapat menyetujui.')
+  if(!canApprove()) return alert('Hanya Admin/Bendahara yang dapat menyetujui.')
   const row=v10Transactions.find(x=>x.id===id); if(!row)return
   const {error}=await supabaseClient.from('transactions').update({status:'approved',approved_by:currentUser.id,approved_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id)
   if(error)return alert('Gagal approve: '+error.message)
-  await loadTransactions(); audit('APPROVE_TRANSAKSI',row.description); await saveDB(); renderTransactions()
+  audit('APPROVE_TRANSAKSI',row.description); await saveDB(); await loadTransactions(); renderTransactions()
+}
+async function rejectTransaction(id){
+  if(!canApprove()) return alert('Hanya Admin/Bendahara yang dapat menolak.')
+  const row=v10Transactions.find(x=>x.id===id); if(!row)return
+  if(!confirm(`Tolak transaksi "${row.description}"?`))return
+  const {error}=await supabaseClient.from('transactions').update({status:'rejected',approved_by:currentUser.id,approved_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id)
+  if(error)return alert('Gagal menolak transaksi: '+error.message)
+  audit('REJECT_TRANSAKSI',row.description); await saveDB(); await loadTransactions(); renderTransactions()
 }
 async function deleteTransaction(id){
-  if(!['admin','bendahara'].includes(currentProfile?.role)) return alert('Hanya Admin/Bendahara yang dapat menghapus transaksi.')
+  if(!canApprove()) return alert('Hanya Admin/Bendahara yang dapat menghapus transaksi.')
   const row=v10Transactions.find(x=>x.id===id); if(!row)return
   if(!confirm(`Hapus transaksi "${row.description}"?`))return
   const {error}=await supabaseClient.from('transactions').delete().eq('id',id); if(error)return alert('Gagal menghapus: '+error.message)
   audit('HAPUS_TRANSAKSI',row.description); await saveDB(); await loadTransactions(); renderTransactions()
+}
+async function migrateLegacyTransactions(){
+  if(currentProfile?.role!=='admin') return alert('Migrasi hanya untuk admin.')
+  if(!confirm('Migrasikan data Pengeluaran dan Penarikan V9 ke transaksi V10? Data lama tidak akan dihapus dan migrasi aman dari duplikasi.')) return
+  const {data,error}=await supabaseClient.rpc('migrate_legacy_finance_data')
+  if(error) return alert('Migrasi gagal: '+error.message)
+  alert(`✅ Migrasi selesai. ${Number(data)||0} transaksi baru ditambahkan.`)
+  await loadTransactions(); renderTransactions()
 }

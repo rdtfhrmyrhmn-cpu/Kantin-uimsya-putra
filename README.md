@@ -71,3 +71,13 @@ V10 menambahkan modul transaksi terstruktur (`transactions`), kategori, approval
 5. Setelah login, buka menu **Transaksi** untuk modul transaksi baru.
 
 Data lama v9 tetap dipertahankan; modul transaksi V10 berjalan berdampingan agar upgrade tidak menghapus data lama. Migrasi historis otomatis penuh dapat dilakukan pada tahap berikutnya setelah struktur transaksi divalidasi.
+
+
+## V10.1 Production Hardening
+- Admin dapat melihat transaksi seluruh pengguna.
+- Role akun: Admin, Bendahara, Petugas, Viewer, User.
+- Admin dapat menetapkan role saat membuat akun dan mengubah role pengguna.
+- Audit transaksi otomatis tersimpan di `audit_logs`.
+- Periode tertutup ditegakkan di database untuk transaksi.
+- Tersedia migrasi aman data Pengeluaran/Penarikan V9 ke tabel `transactions` melalui tombol **Migrasi V9** (Admin). Data V9 lama tidak dihapus.
+- Jalankan ulang seluruh `supabase.sql` di Supabase SQL Editor untuk menerapkan perubahan V10.1.
