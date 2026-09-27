@@ -3,8 +3,8 @@
  */
 (function () {
   'use strict';
-  const SUPABASE_URL = 'https://caotqidtzccugtomtpsx.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_8o9BQgrJ62emURiuzXstTg_xkXOWJD3';
+  const SUPABASE_URL = 'https://eusyxssmytqnmlbnxigl.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_ts62tbo3Z5cdZ9-fHTWxxQ_z9ox4OB-';
 
   if (!window.supabase || typeof window.supabase.createClient !== 'function') {
     console.error('Supabase JS belum dimuat.');
