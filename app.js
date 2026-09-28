@@ -564,7 +564,7 @@
       summary=`<div class="print-summary compact"><div><span>Total Setoran</span><b>${fmt(masuk)}</b></div><div><span>Total Penarikan</span><b>${fmt(keluar)}</b></div><div><span>Selisih</span><b>${fmt(masuk-keluar)}</b></div></div>`;
     }
     el.innerHTML=`<div class="print-sheet ${kind==='daily'?'print-wide':''}">
-      <header class="print-header"><div class="print-brand-mark">KU</div><div><div class="print-kicker">KANTIN UIMSYA PUTRI</div><h3>${reportName}</h3><p>Keuangan &amp; Operasional</p></div><div class="print-meta"><span>Dicetak</span><b>${generated}</b></div></header>
+      <header class="print-header"><div class="print-brand-mark">KU</div><div><div class="print-kicker">KANTIN UIMSYA PUTRA</div><h3>${reportName}</h3><p>Keuangan &amp; Operasional</p></div><div class="print-meta"><span>Dicetak</span><b>${generated}</b></div></header>
       <div class="print-rule"></div>${summary}${body}
       <footer class="print-footer"><span>Dokumen laporan internal • Kantin Uimsya Putra</span><span>Dicetak dari Sistem Keuangan</span></footer>
     </div>`;
