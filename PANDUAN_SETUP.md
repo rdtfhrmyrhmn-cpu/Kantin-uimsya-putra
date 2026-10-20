@@ -139,3 +139,11 @@ Gunakan **Publishable/anon key**, bukan service_role.
 
 **"Akun dibuat tapi gagal masuk kembali sebagai admin"**
 → Password konfirmasi admin salah. Akun baru tetap terbuat. Login manual ke Supabase Auth untuk verifikasi.
+
+---
+
+## 11. Fitur v3: Periode, Pengeluaran, Evaluasi
+
+- **Periode (Beranda)**: pilih bulan di kolom *Periode*. Beranda, Transaksi, Pengeluaran, Buku Kas, Tabungan, Laporan Harian dan Evaluasi hanya menampilkan data bulan tersebut. Pilihan tersimpan di browser. Pilih "Semua Periode" untuk melihat seluruhnya. Saldo tabungan dan piutang/hutang tetap menampilkan total berjalan.
+- **Pengeluaran**: rekap per kategori + rincian, tombol *Cetak Rekap* / *Cetak Lengkap*. Kategori yang ditulis dengan huruf besar/kecil berbeda (mis. "Gas" dan "gas") digabung otomatis.
+- **Evaluasi dan Rekapitulasi**: catatan keluh kesah anggota dan target kantin, plus rekap angka periode. Catatan disimpan di tabel `kantin_data` dengan tipe `catatan` — **tidak perlu mengubah database**.

@@ -135,3 +135,35 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app-shell{min-h
 /* Form password di modal create user */
 #modalForm label { display:block;margin-bottom:14px; }
 #modalForm label small.muted { display:block;margin-top:2px;font-size:11px;font-weight:400;color:rgba(255,255,255,.45); }
+
+
+/* ── Periode, Pengeluaran, Evaluasi (v3) ─────────────────────────── */
+.period-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:16px 0}
+.period-bar label{display:flex;align-items:center;gap:10px;font-weight:800;white-space:nowrap}
+.period-bar select{width:auto;min-width:220px}
+.period-bar p{margin:0;font-size:12px;flex:1;min-width:200px}
+.filters .period-select,.period-filter-bar .period-select{width:auto;min-width:190px}
+.stat strong{word-break:break-word}
+.cat-bar{height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
+.cat-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--s),var(--m))}
+.exp-cat-row{cursor:pointer}.exp-cat-row:hover td{background:rgba(255,255,255,.06)}.exp-cat-row.selected td{background:rgba(232,180,176,.18)}
+.check-inline{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:600}
+.check-inline input{width:auto;min-width:0;accent-color:var(--b)}
+.notes-list{display:grid;gap:12px}
+.note{padding:14px 14px 12px 16px;border-radius:14px;border:1px solid var(--border);border-left-width:4px;background:rgba(255,255,255,.06)}
+.note.keluhan{border-left-color:#f87171}.note.target{border-left-color:#fbbf24}
+.note-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.note-top b{font-size:14px;line-height:1.35}
+.note-body{white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:26px;margin:8px 0 6px;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 25px,rgba(255,255,255,.1) 25px,rgba(255,255,255,.1) 26px)}
+.note-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11px;color:var(--muted);align-items:center}
+.note-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+.note-foot select{width:auto;padding:6px 8px;font-size:12px}
+.note-foot .row-actions{flex-shrink:0}
+.print-section{margin:16px 0 8px;font-size:13px;font-weight:800;color:var(--m);letter-spacing:.04em;text-transform:uppercase}
+.wrap-cell{white-space:normal!important;min-width:180px;max-width:420px;word-break:break-word}
+@media print{
+  .print-section{margin:12px 0 5px;font-size:10px;color:#111;border-bottom:1.5px solid #111;padding-bottom:3px;page-break-after:avoid}
+  .wrap-cell{white-space:pre-line!important;min-width:0;max-width:none}
+}
+.filters input:not([type=checkbox]),.filters select{width:auto;flex:1 1 170px}
+.filters .period-select{flex:0 0 auto}
