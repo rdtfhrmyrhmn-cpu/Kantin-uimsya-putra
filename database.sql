@@ -1,4 +1,4 @@
--- Kantin Uimsya Putri — Supabase schema & security (v2: Role System)
+-- Kantin Uimsya Putra — Supabase schema & security (v2: Role System)
 -- Jalankan di Supabase > SQL Editor.
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -58,7 +58,6 @@ DROP POLICY IF EXISTS "kantin_data_authenticated_select" ON kantin_data;
 DROP POLICY IF EXISTS "kantin_data_authenticated_insert" ON kantin_data;
 DROP POLICY IF EXISTS "kantin_data_authenticated_update" ON kantin_data;
 DROP POLICY IF EXISTS "kantin_data_authenticated_delete" ON kantin_data;
-DROP POLICY IF EXISTS "kantin_data_admin_delete" ON kantin_data;
 
 -- Semua user terotentikasi bisa baca
 CREATE POLICY "kantin_data_authenticated_select" ON kantin_data
@@ -129,4 +128,3 @@ CREATE POLICY "kantin_users_authenticated_select" ON kantin_users
 -- 'pembayaran_hutang'   → Pembayaran hutang
 -- 'persediaan'          → Stok barang
 -- 'pemasok'             → Data supplier
--- 'catatan'             → Evaluasi & Rekapitulasi (keluhan anggota, target, evaluasi; data: jenis, judul, isi, dari, status, tenggat, nominal)
