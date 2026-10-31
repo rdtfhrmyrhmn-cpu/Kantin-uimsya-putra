@@ -171,3 +171,5 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app-shell{min-h
 .print-month-subtotal td{background:rgba(255,255,255,.05);font-weight:700}
 .print-grand-total td{background:rgba(255,255,255,.08);font-weight:800}
 .num{text-align:right}
+@media print{.print-sheet+.print-sheet{break-before:page;page-break-before:always}}
+.period-filter-bar #printAllBtn{margin-left:auto}

@@ -576,7 +576,12 @@
 
   function renderReport(kind){
     state.report=kind;
-    const el=$('#reportPreview'),rows=sortChronological(reportData(kind),'tgl');
+    const el=$('#reportPreview');
+    el.innerHTML=reportHTML(kind);
+    if(kind==='daily'){const rfEl=el.querySelector('#reportPeriodFilter');if(rfEl)rfEl.onchange=()=>{state.dailyPeriod=rfEl.value;renderReport('daily');};}
+  }
+  function reportHTML(kind){
+    const rows=sortChronological(reportData(kind),'tgl');
     const reportNames={cash:'Buku Kas',profit:'Laba Rugi 12 Bulan',receivable:'Laporan Piutang',payable:'Laporan Hutang',saving:'Laporan Tabungan',daily:'Laporan Harian Kantin',expense:'Laporan Pengeluaran',evaluasi:'Evaluasi dan Rekapitulasi',stock:'Laporan Persediaan',supplier:'Laporan Pemasok'};
     const reportName=reportNames[kind]||'Laporan Keuangan';
     const generated=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
@@ -646,12 +651,27 @@
       body=`<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${x.tgl}</td><td>${x.label}</td><td>${esc(x.note)}</td><td class="num">${fmt(x.in||x.out)}</td></tr>`).join('')}</tbody></table></div>`;
       summary=`<div class="print-summary compact"><div><span>Total Setoran</span><b>${fmt(keluar)}</b></div><div><span>Total Penarikan</span><b>${fmt(masuk)}</b></div><div><span>Selisih</span><b>${fmt(keluar-masuk)}</b></div></div>`;
     }
-    el.innerHTML=`<div class="print-sheet ${kind==='daily'?'print-wide':''}">
+    return `<div class="print-sheet ${kind==='daily'?'print-wide':''}">
       <header class="print-header"><div class="print-brand-mark">KU</div><div><div class="print-kicker">KANTIN UIMSYA PUTRA</div><h3>${reportName}</h3><p>Keuangan &amp; Operasional${periodTxt}</p></div><div class="print-meta"><span>Dicetak</span><b>${generated}</b></div></header>
       <div class="print-rule"></div>${summary}${body}
       <footer class="print-footer"><span>Dokumen laporan internal • Kantin Uimsya Putra</span><span>Dicetak dari Sistem Keuangan</span></footer>
     </div>`;
-    if(kind==='daily'){const rfEl=el.querySelector('#reportPeriodFilter');if(rfEl)rfEl.onchange=()=>{state.dailyPeriod=rfEl.value;renderReport('daily');};}
+  }
+  /* Cetak semua laporan sekaligus: satu laporan per halaman, urut seperti menu */
+  const ALL_REPORTS=['cash','daily','receivable','payable','stock','supplier','saving','expense','profit','evaluasi'];
+  function printAll(){
+    const prevTab=state.tab,prevReport=state.report,prevMode=state.expMode;
+    state.expMode='lengkap';
+    nav('laporan');
+    $('#reportPreview').innerHTML=ALL_REPORTS.map(reportHTML).join('');
+    const back=()=>{
+      window.removeEventListener('afterprint',back);
+      state.expMode=prevMode;
+      if(prevReport)renderReport(prevReport);else $('#reportPreview').innerHTML='';
+      if(prevTab!=='laporan')nav(prevTab);
+    };
+    window.addEventListener('afterprint',back);
+    setTimeout(()=>window.print(),300);
   }
 
   /* ── Pengeluaran & Rekap per Kategori ────────────────────────────────────── */
@@ -959,6 +979,7 @@
     ['trxSearch','trxType','trxFrom','trxTo'].forEach(id=>$('#'+id)?.addEventListener('input',renderTransactions));
     $('#resetTrx').onclick=()=>{['trxSearch','trxFrom','trxTo'].forEach(id=>$('#'+id).value='');$('#trxType').value='';renderTransactions()};
 
+    $('#printAllBtn').onclick=printAll;
     $$('[data-print]').forEach(b=>b.addEventListener('click',()=>printKind(b.dataset.print)));
     $$('.period-select').forEach(sel=>sel.addEventListener('change',()=>setPeriod(sel.value)));
     $('#addExpense').onclick=()=>openTransaction('pengeluaran');
