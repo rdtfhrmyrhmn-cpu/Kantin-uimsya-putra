@@ -172,4 +172,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app-shell{min-h
 .print-grand-total td{background:rgba(255,255,255,.08);font-weight:800}
 .num{text-align:right}
 @media print{.print-sheet+.print-sheet{break-before:page;page-break-before:always}}
-.period-filter-bar #printAllBtn{margin-left:auto}
+.period-filter-bar #pdfAllBtn{margin-left:auto}
+
+/* Sembunyikan panel/drawer Netlify bila ikut tersuntik */
+iframe[src*="app.netlify.com"],netlify-drawer,#netlify-drawer{display:none!important}

@@ -147,3 +147,8 @@ Gunakan **Publishable/anon key**, bukan service_role.
 - **Periode (Beranda)**: pilih bulan di kolom *Periode*. Beranda, Transaksi, Pengeluaran, Buku Kas, Tabungan, Laporan Harian dan Evaluasi hanya menampilkan data bulan tersebut. Pilihan tersimpan di browser. Pilih "Semua Periode" untuk melihat seluruhnya. Saldo tabungan dan piutang/hutang tetap menampilkan total berjalan.
 - **Pengeluaran**: rekap per kategori + rincian, tombol *Cetak Rekap* / *Cetak Lengkap*. Kategori yang ditulis dengan huruf besar/kecil berbeda (mis. "Gas" dan "gas") digabung otomatis.
 - **Evaluasi dan Rekapitulasi**: catatan keluh kesah anggota dan target kantin, plus rekap angka periode. Catatan disimpan di tabel `kantin_data` dengan tipe `catatan` — **tidak perlu mengubah database**.
+
+## 12. Simpan PDF & Netlify Drawer
+
+- Tombol **📄 PDF** ada di samping setiap tombol Cetak, dan **📄 Simpan PDF Semua Laporan** di tab Laporan. PDF langsung terunduh (A4, bernomor halaman). Library-nya ada di folder `vendor/` — ikut di-upload bersama file lain.
+- **Pop-up Netlify** (Netlify Drawer, panel komentar Deploy Preview): sudah diblokir lewat `netlify.toml`. Untuk mematikannya total, buka Netlify → Project configuration → Build & deploy → Continuous deployment → *Collaboration tools* → Configure → matikan Netlify Drawer.

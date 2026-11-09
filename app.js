@@ -657,6 +657,58 @@
       <footer class="print-footer"><span>Dokumen laporan internal • Kantin Uimsya Putra</span><span>Dicetak dari Sistem Keuangan</span></footer>
     </div>`;
   }
+  /* ── Simpan PDF (unduh langsung, tanpa dialog cetak) ─────────────────────── */
+  const _scripts={};
+  const loadScript=src=>_scripts[src]||(_scripts[src]=new Promise((ok,fail)=>{const t=document.createElement('script');t.src=src;t.onload=ok;t.onerror=()=>{delete _scripts[src];fail(new Error('Gagal memuat '+src));};document.head.appendChild(t);}));
+  const PDF_NAMES={cash:'Buku-Kas',daily:'Laporan-Harian',receivable:'Piutang',payable:'Hutang',stock:'Persediaan',supplier:'Pemasok',saving:'Tabungan',expense:'Pengeluaran',profit:'Laba-Rugi',evaluasi:'Evaluasi-Rekapitulasi'};
+  async function savePdf(kinds,mode){
+    kinds=[].concat(kinds);
+    let fr=null;
+    try{
+      toast('Menyiapkan PDF…');
+      await Promise.all([loadScript('vendor/html2canvas.min.js'),loadScript('vendor/jspdf.umd.min.js')]);
+      const prevMode=state.expMode;if(mode)state.expMode=mode;else if(kinds.length>1)state.expMode='lengkap';
+      let html;try{html=kinds.map(reportHTML).join('');}finally{state.expMode=prevMode;}
+      // render dengan gaya cetak (putih, hitam) di iframe tersembunyi
+      const css=(await (await fetch('style.css')).text()).replace(/@media\s+print/g,'@media all');
+      const W=703;
+      fr=document.createElement('iframe');fr.setAttribute('aria-hidden','true');
+      fr.style.cssText=`position:fixed;left:-10000px;top:0;width:${W}px;height:1200px;border:0`;
+      document.body.appendChild(fr);
+      const d=fr.contentDocument;d.open();
+      d.write(`<!doctype html><html><head><meta charset="utf-8"><style>${css}</style><style>html,body{background:#fff!important;color:#111;margin:0;padding:0;width:${W}px}</style></head><body><div id="reportPreview">${html}</div></body></html>`);
+      d.close();
+      await new Promise(r=>setTimeout(r,400));
+      const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+      const mx=12,my=12,mb=14,cw=210-2*mx,chH=297-my-mb;
+      let first=true;
+      for(const sh of d.querySelectorAll('.print-sheet')){
+        const canvas=await window.html2canvas(sh,{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:W});
+        const box=sh.getBoundingClientRect(),k=canvas.width/box.width,mm=cw/box.width,pageH=chH/mm;
+        // potong halaman di batas baris tabel agar tulisan tidak terbelah
+        const cuts=[...sh.querySelectorAll('tr,.print-section,.print-header,.print-summary')].map(e=>e.getBoundingClientRect().bottom-box.top).sort((a,b)=>a-b);
+        let y=0;
+        while(y<box.height-1){
+          let end=Math.min(y+pageH,box.height);
+          if(end<box.height){const ok=cuts.filter(c=>c>y+pageH*0.4&&c<=end);if(ok.length)end=ok[ok.length-1];}
+          const ph=Math.max(1,Math.round((end-y)*k)),part=document.createElement('canvas');
+          part.width=canvas.width;part.height=ph;
+          part.getContext('2d').drawImage(canvas,0,Math.round(y*k),canvas.width,ph,0,0,canvas.width,ph);
+          if(!first)pdf.addPage();first=false;
+          pdf.addImage(part.toDataURL('image/jpeg',0.92),'JPEG',mx,my,cw,(end-y)*mm);
+          y=end;
+        }
+      }
+      const n=pdf.getNumberOfPages();
+      for(let i=1;i<=n;i++){pdf.setPage(i);pdf.setFontSize(8);pdf.setTextColor(120);pdf.text('Kantin Uimsya Putra',mx,291);pdf.text(`Halaman ${i} / ${n}`,210-mx,291,{align:'right'});}
+      const per=(state.period||'Semua-Periode');
+      const name=(kinds.length>1?'Semua-Laporan':(PDF_NAMES[kinds[0]]||'Laporan')+(kinds[0]==='expense'&&mode==='rekap'?'-Rekap':''))+'_'+per+'.pdf';
+      pdf.save(name);
+      toast('PDF tersimpan: '+name);
+    }catch(e){console.error(e);toast('Gagal membuat PDF: '+(e.message||e),true);}
+    finally{if(fr)fr.remove();}
+  }
+
   /* Cetak semua laporan sekaligus: satu laporan per halaman, urut seperti menu */
   const ALL_REPORTS=['cash','daily','receivable','payable','stock','supplier','saving','expense','profit','evaluasi'];
   function printAll(){
@@ -980,6 +1032,14 @@
     $('#resetTrx').onclick=()=>{['trxSearch','trxFrom','trxTo'].forEach(id=>$('#'+id).value='');$('#trxType').value='';renderTransactions()};
 
     $('#printAllBtn').onclick=printAll;
+    $('#pdfAllBtn').onclick=()=>savePdf(ALL_REPORTS);
+    $('#pdfReportBtn').onclick=()=>state.report?savePdf(state.report):toast('Pilih salah satu laporan dulu.',true);
+    // tombol "Simpan PDF" di samping setiap tombol Cetak
+    const addPdfBtn=(btn,kind,mode)=>{const b=document.createElement('button');b.className='btn';b.textContent='📄 PDF';b.title='Simpan sebagai PDF';b.onclick=()=>savePdf(kind,mode);btn.after(b);};
+    $$('[data-print]').forEach(b=>addPdfBtn(b,b.dataset.print));
+    addPdfBtn($('#printExpenseRekap'),'expense','rekap');
+    addPdfBtn($('#printExpenseFull'),'expense','lengkap');
+    addPdfBtn($('#printEval'),'evaluasi');
     $$('[data-print]').forEach(b=>b.addEventListener('click',()=>printKind(b.dataset.print)));
     $$('.period-select').forEach(sel=>sel.addEventListener('change',()=>setPeriod(sel.value)));
     $('#addExpense').onclick=()=>openTransaction('pengeluaran');
