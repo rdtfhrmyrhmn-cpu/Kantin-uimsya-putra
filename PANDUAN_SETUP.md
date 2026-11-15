@@ -152,3 +152,11 @@ Gunakan **Publishable/anon key**, bukan service_role.
 
 - Tombol **📄 PDF** ada di samping setiap tombol Cetak, dan **📄 Simpan PDF Semua Laporan** di tab Laporan. PDF langsung terunduh (A4, bernomor halaman). Library-nya ada di folder `vendor/` — ikut di-upload bersama file lain.
 - **Pop-up Netlify** (Netlify Drawer, panel komentar Deploy Preview): sudah diblokir lewat `netlify.toml`. Untuk mematikannya total, buka Netlify → Project configuration → Build & deploy → Continuous deployment → *Collaboration tools* → Configure → matikan Netlify Drawer.
+
+## 13. Tampilan Dasbor Kaca (v4)
+
+- Tampilan baru bergaya *glassy dashboard*: bingkai kaca, dock navigasi melengkung di kiri, bar atas dengan sub-menu, kartu kaca, dan pilihan tema **Terang / Gelap** (tersimpan di browser).
+- Di HP, dock berubah menjadi bar menu di bawah dan bar atas bisa digeser.
+- Kolom pencarian (atau `Ctrl+K`) bisa dipakai untuk pindah halaman dan menjalankan perintah (transaksi baru, cetak semua, simpan PDF, ganti tema).
+- Beranda: peringatan otomatis (laporan hari ini belum diisi, stok menipis, piutang jatuh tempo, keluhan belum selesai), pengeluaran per kategori, keluh kesah & target, kalender periode (klik tanggal untuk membuka Laporan Harian), dan ring margin laba / target tercapai.
+- File baru: `icons.js`, `assets/bg.jpg`. Semua fungsi lama (cetak, PDF, periode, evaluasi) tetap sama.

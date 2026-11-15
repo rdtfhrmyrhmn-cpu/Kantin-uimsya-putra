@@ -1,46 +1,133 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#2d0a0a">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#08080a">
   <title>Kantin Uimsya Putra — Keuangan</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"><link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="app" class="app-shell">
-  <aside class="sidebar">
-    <div class="brand"><div class="brand-logo"><img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">🏪</div><div><b>Kantin Uimsya Putra</b><span>Keuangan & Operasional</span></div></div>
-    <nav class="nav" id="sideNav">
-      <button data-tab="home">🏠 <span>Beranda</span></button>
-      <button data-tab="ringkasan">📊 <span>Ringkasan</span></button>
-      <button data-tab="transaksi">💳 <span>Transaksi</span></button>
-      <button data-tab="pengeluaran">💸 <span>Pengeluaran</span></button>
-      <button data-tab="kas">📒 <span>Buku Kas</span></button>
-      <button data-tab="harian">🧾 <span>Laporan Harian</span></button>
-      <button data-tab="piutang">📝 <span>Piutang</span></button>
-      <button data-tab="hutang">📌 <span>Hutang</span></button>
-      <button data-tab="persediaan">📦 <span>Persediaan</span></button>
-      <button data-tab="pemasok">🤝 <span>Pemasok</span></button>
-      <button data-tab="tabungan">🏦 <span>Tabungan</span></button>
-      <button data-tab="laporan">📑 <span>Laporan</span></button>
-      <button data-tab="evaluasi">📝 <span>Evaluasi & Rekapitulasi</span></button>
-      <button data-tab="pengguna" id="navPengguna" style="display:none">👥 <span>Pengguna</span></button>
-      <button data-tab="pengaturan">⚙️ <span>Pengaturan</span></button>
-    </nav>
-    <div class="sidebar-foot"><button id="logoutBtn" class="danger wide">⏻ Keluar</button></div>
-  </aside>
+<div id="app" class="app-shell theme-dark">
+  <div class="gd-orbs" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i></div>
+  <div class="gd-console">
+    <i class="gd-chip tl" aria-hidden="true"></i><i class="gd-chip tr" aria-hidden="true"></i><i class="gd-chip bl" aria-hidden="true"></i><i class="gd-chip br" aria-hidden="true"></i>
 
-  <main class="main">
-    <header class="topbar">
-      <div><button class="mobile-menu" id="mobileMenu">☰</button><span class="crumb" id="pageTitle">Beranda</span><small id="userLabel">Pengguna</small></div>
-      <div class="top-actions"><span class="online-dot">● Online</span><button class="ghost" id="refreshBtn">↻</button></div>
-    </header>
+    <aside class="gd-dock" aria-label="Navigasi utama">
+      <svg class="gd-dock-curve" viewBox="0 0 74 640" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="dockGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1" stop-opacity=".95"/><stop offset="50%" stop-color="#4f46e5" stop-opacity=".98"/><stop offset="100%" stop-color="#3730a3" stop-opacity=".95"/></linearGradient>
+          <linearGradient id="dockStroke" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity=".85"/><stop offset="35%" stop-color="#ffd600" stop-opacity=".55"/><stop offset="70%" stop-color="#fff" stop-opacity=".3"/><stop offset="100%" stop-color="#a5b4fc" stop-opacity=".5"/></linearGradient>
+        </defs>
+        <path d="M 0,0 L 0,20 C 0,65 74,65 74,115 L 74,525 C 74,575 0,575 0,620 L 0,640 Z" fill="url(#dockGrad)" stroke="url(#dockStroke)" stroke-width="1.2"/>
+      </svg>
+      <nav class="gd-dock-stack" id="sideNav">
+        <button type="button" class="gd-dock-item" data-tab="home" data-icon-wrap ><i data-icon="layout-grid" data-size="20"></i><span class="gd-dock-label">Beranda</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="ringkasan" data-icon-wrap ><i data-icon="chart-pie" data-size="20"></i><span class="gd-dock-label">Ringkasan</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <i class="gd-dock-sep" aria-hidden="true"></i><button type="button" class="gd-dock-item" data-tab="transaksi" data-icon-wrap ><i data-icon="credit-card" data-size="20"></i><span class="gd-dock-label">Transaksi</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="pengeluaran" data-icon-wrap ><i data-icon="wallet" data-size="20"></i><span class="gd-dock-label">Pengeluaran</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="kas" data-icon-wrap ><i data-icon="book-open" data-size="20"></i><span class="gd-dock-label">Buku Kas</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="piutang" data-icon-wrap ><i data-icon="hand-coins" data-size="20"></i><span class="gd-dock-label">Piutang</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="hutang" data-icon-wrap ><i data-icon="receipt" data-size="20"></i><span class="gd-dock-label">Hutang</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="tabungan" data-icon-wrap ><i data-icon="piggy-bank" data-size="20"></i><span class="gd-dock-label">Tabungan</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <i class="gd-dock-sep" aria-hidden="true"></i><button type="button" class="gd-dock-item" data-tab="harian" data-icon-wrap ><i data-icon="clipboard-list" data-size="20"></i><span class="gd-dock-label">Laporan Harian</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="persediaan" data-icon-wrap ><i data-icon="package" data-size="20"></i><span class="gd-dock-label">Persediaan</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="pemasok" data-icon-wrap ><i data-icon="handshake" data-size="20"></i><span class="gd-dock-label">Pemasok</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <i class="gd-dock-sep" aria-hidden="true"></i><button type="button" class="gd-dock-item" data-tab="laporan" data-icon-wrap ><i data-icon="file-bar-chart" data-size="20"></i><span class="gd-dock-label">Laporan</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="evaluasi" data-icon-wrap ><i data-icon="notebook-pen" data-size="20"></i><span class="gd-dock-label">Evaluasi & Rekap</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <i class="gd-dock-sep" aria-hidden="true"></i><button type="button" class="gd-dock-item" data-tab="pengguna" data-icon-wrap id="navPengguna" style="display:none"><i data-icon="users" data-size="20"></i><span class="gd-dock-label">Pengguna</span><b class="gd-dot" aria-hidden="true"></b></button>
+        <button type="button" class="gd-dock-item" data-tab="pengaturan" data-icon-wrap ><i data-icon="settings" data-size="20"></i><span class="gd-dock-label">Pengaturan</span><b class="gd-dot" aria-hidden="true"></b></button>
+        
+      </nav>
+      <button type="button" class="gd-dock-item gd-logout" id="logoutBtn" title="Keluar"><i data-icon="log-out" data-size="19"></i><span class="gd-dock-label">Keluar</span></button>
+    </aside>
 
+    <main class="gd-main">
+      <header class="gd-topbar">
+        <div class="gd-brand"><span class="gd-brand-logo"><img src="assets/logo.png" alt="" onerror="this.remove()"><em>🏪</em></span><div class="gd-brand-text"><b>Kantin Uimsya Putra</b><span id="pageTitle">Beranda</span></div></div>
+        <nav class="gd-tabs" id="gdTabs" aria-label="Sub menu"></nav>
+        <div class="gd-search">
+          <i data-icon="search" data-size="15"></i>
+          <input id="cmdInput" placeholder="Cari halaman atau perintah…" autocomplete="off" aria-label="Cari halaman atau perintah">
+          <kbd>Ctrl K</kbd>
+          <div class="gd-cmd" id="cmdResults" hidden></div>
+        </div>
+        <div class="gd-actions">
+          <div class="gd-theme" role="group" aria-label="Tema"><button type="button" data-theme-btn="light"><i data-icon="sun" data-size="13"></i><span>Terang</span></button><button type="button" data-theme-btn="dark"><i data-icon="moon" data-size="13"></i><span>Gelap</span></button></div>
+          <button type="button" class="gd-icon-btn" id="bellBtn" title="Peringatan"><i data-icon="bell" data-size="16"></i><span class="gd-notif-dot" id="bellDot" hidden></span></button>
+          <button type="button" class="gd-icon-btn" id="refreshBtn" title="Muat ulang data"><i data-icon="refresh-cw" data-size="16"></i></button>
+          <button type="button" class="gd-export-btn" id="pdfTopBtn" title="Simpan semua laporan sebagai PDF"><i data-icon="download" data-size="15"></i><span>PDF Semua</span><em>.pdf</em></button>
+          <button type="button" class="gd-primary-btn" id="topAddBtn"><i data-icon="plus" data-size="15"></i><span>Transaksi</span></button>
+          <div class="gd-user" id="userLabel"></div>
+        </div>
+      </header>
+
+      <div class="gd-content" id="gdContent">
     <!-- Beranda -->
     <section class="page active" id="tab-home">
-      <div class="hero"><div><div class="eyebrow">KANTIN UIMSYA PUTRA</div><h1 id="homeGreeting">Selamat datang 👋</h1><p>Kelola kas, transaksi, tabungan, piutang, hutang dan operasional dalam satu tempat.</p><div class="clock" id="homeClock">00:00:00</div><div class="date" id="homeDate">—</div></div><div class="hero-logo"><img src="assets/logo.png" alt="Logo"><span>✦</span></div></div>
-      <div class="card period-bar"><label>📅 Periode<select class="period-select" id="homePeriod"></select></label><p class="muted" id="homePeriodNote">Hanya data pada periode terpilih yang ditampilkan.</p></div>
+      <div class="gd-hero">
+        <div class="gd-hero-greet">
+          <h1 class="gd-hello"><span id="homeGreeting">Halo!</span> <span class="gd-bubble">👋✨</span></h1>
+          <div class="gd-hero-sub">Bagaimana kondisi kantin hari ini?</div>
+          <p class="gd-hero-desc"><span id="homeDate">—</span> · <span id="homeClock">00:00:00</span></p>
+          <label class="gd-period"><i data-icon="calendar" data-size="15"></i><span>Periode</span><select class="period-select" id="homePeriod"></select></label>
+          <small class="gd-period-note" id="homePeriodNote"></small>
+        </div>
+        <div class="gd-quick-deck">
+          <button type="button" class="gd-quick dashed" id="qaAdd"><span class="gd-add-circle"><i data-icon="plus" data-size="20"></i></span><span class="gd-q-text"><b>Transaksi baru</b><small>Pemasukan / pengeluaran</small></span></button>
+          <button type="button" class="gd-quick" data-tab="harian"><span class="gd-qicon"><i data-icon="clipboard-list" data-size="18"></i></span><span class="gd-q-text"><b>Laporan Harian</b><small>Isi laporan hari ini</small></span></button>
+          <button type="button" class="gd-quick" id="qaExpense"><span class="gd-qicon"><i data-icon="wallet" data-size="18"></i></span><span class="gd-q-text"><b>Pengeluaran</b><small>Catat &amp; rekap kategori</small></span></button>
+          <button type="button" class="gd-quick hl" id="qaPrintAll"><span class="gd-qicon"><i data-icon="printer" data-size="18"></i></span><span class="gd-q-text"><b>Cetak Semua</b><small>Semua laporan sekaligus</small></span></button>
+        </div>
+      </div>
+
       <div class="stats" id="homeStats"></div>
-      <div class="grid-2"><div class="card"><div class="card-head"><h3 id="homeMonthTitle">Ringkasan Periode</h3><button class="link-btn" data-tab="ringkasan">Lihat detail →</button></div><div id="homeMonth"></div></div><div class="card"><div class="card-head"><h3>Aksi Cepat</h3></div><div class="quick-grid"><button class="quick" data-open="cash-in">➕<span>Pemasukan</span></button><button class="quick" data-open="cash-out">➖<span>Pengeluaran</span></button><button class="quick" data-tab="harian">🧾<span>Laporan Harian</span></button><button class="quick" data-open="withdraw">🏦<span>Tarik Tabungan</span></button></div></div></div>
+
+      <div class="gd-grid">
+        <div class="gd-col">
+          <div class="card gd-card" id="alertCard">
+            <div class="gd-card-h"><h3><i data-icon="bell" data-size="17"></i> Peringatan</h3><span class="gd-count" id="alertCount">0</span></div>
+            <div class="gd-alerts" id="homeAlerts"></div>
+          </div>
+          <div class="card gd-card">
+            <div class="gd-card-h"><h3><i data-icon="trending-up" data-size="17"></i> <span id="homeMonthTitle">Ringkasan Periode</span></h3><button type="button" class="gd-link" data-tab="ringkasan">Detail</button></div>
+            <div id="homeMonth"></div>
+          </div>
+          <div class="card gd-card">
+            <div class="gd-card-h"><h3><i data-icon="wallet" data-size="17"></i> Pengeluaran per Kategori</h3><button type="button" class="gd-link" data-tab="pengeluaran">Semua</button></div>
+            <div id="homeCats" class="gd-bars"></div>
+          </div>
+        </div>
+
+        <div class="gd-col">
+          <div class="card gd-card">
+            <div class="gd-card-h"><h3><i data-icon="message-square-text" data-size="17"></i> Keluh Kesah Anggota</h3><button type="button" class="gd-link" id="qaKeluhan">+ Catat</button></div>
+            <div class="gd-chips" id="noteChips"><button type="button" class="active" data-chip="all">Semua</button><button type="button" data-chip="Baru">Baru</button><button type="button" data-chip="Dibahas">Dibahas</button><button type="button" data-chip="Selesai">Selesai</button></div>
+            <div class="gd-notes" id="homeKeluhan"></div>
+          </div>
+          <div class="card gd-card">
+            <div class="gd-card-h"><h3><i data-icon="target" data-size="17"></i> Target Kantin</h3><button type="button" class="gd-link" id="qaTarget">+ Target</button></div>
+            <div class="gd-notes" id="homeTargets"></div>
+          </div>
+          <div class="gd-promo">
+            <span class="gd-promo-ic"><i data-icon="file-down" data-size="30"></i></span>
+            <h3>Laporan siap cetak</h3>
+            <p>Cetak atau simpan semua laporan (Buku Kas sampai Evaluasi) sekaligus sebagai PDF.</p>
+            <div class="gd-promo-btns"><button type="button" id="gdPrintAll"><i data-icon="printer" data-size="15"></i> Cetak</button><button type="button" id="gdPdfAll"><i data-icon="download" data-size="15"></i> Simpan PDF</button></div>
+          </div>
+        </div>
+
+        <div class="gd-col">
+          <div class="card gd-card">
+            <div class="gd-card-h"><h3><i data-icon="calendar" data-size="17"></i> <span id="calTitle">Kalender</span></h3><div class="gd-cal-nav"><button type="button" id="calPrev" aria-label="Bulan sebelumnya"><i data-icon="chevron-left" data-size="16"></i></button><button type="button" id="calNext" aria-label="Bulan berikutnya"><i data-icon="chevron-right" data-size="16"></i></button></div></div>
+            <div id="homeCal"></div>
+            <div class="gd-legend"><span><i class="d ops"></i>Operasional</span><span><i class="d libur"></i>Libur</span><span><i class="d today"></i>Hari ini</span></div>
+          </div>
+          <div class="gd-rings" id="homeRings"></div>
+          <div class="card gd-card">
+            <div class="gd-card-h"><h3><i data-icon="notebook-text" data-size="17"></i> Catatan Terbaru</h3><button type="button" class="gd-link" data-tab="evaluasi">Buka</button></div>
+            <div id="homeLatest"></div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Ringkasan -->
@@ -148,14 +235,16 @@
         </div>
       </div>
     </section>
-  </main>
+      </div>
+    </main>
+  </div>
 
-  <div class="bottom-nav" id="bottomNav"><button data-tab="home">⌂<span>Beranda</span></button><button data-tab="transaksi">↔<span>Transaksi</span></button><button data-tab="harian">▣<span>Harian</span></button><button data-tab="ringkasan">◉<span>Dashboard</span></button><button data-tab="laporan">≡<span>Laporan</span></button></div>
   <div id="modalRoot"></div><div id="toast" class="toast"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+<script src="icons.js"></script>
 <script src="home.js"></script>
 <script src="app.js"></script>
 </body>
