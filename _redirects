@@ -1,0 +1,3 @@
+# Cloudflare Pages — pengalihan
+# /app sudah otomatis melayani app.html (Pages membuang ekstensi .html)
+/login  /  302

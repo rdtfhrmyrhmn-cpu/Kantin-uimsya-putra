@@ -11,7 +11,7 @@
 
 ## 1. Isi folder
 
-- `index.html`, `app.html`, `app.js`, `home.js`, `style.css`, `supabase.js`, `netlify.toml`, `database.sql`, `assets/logo.png`
+- `index.html`, `app.html`, `app.js`, `home.js`, `style.css`, `supabase.js`, `icons.js`, `_headers`, `_redirects`, `database.sql`, folder `vendor/`, `assets/logo.png`
 
 Tidak ada framework dan tidak ada build command.
 
@@ -109,11 +109,31 @@ Gunakan **Publishable/anon key**, bukan service_role.
 
 ---
 
-## 8. Deploy Netlify / Cloudflare Pages
+## 8. Deploy ke Cloudflare Pages
 
-- Build command: kosong
-- Publish directory: `.` (root)
-- Tidak ada framework
+Situs ini statis (tanpa build). Pilih salah satu cara:
+
+**A. Upload langsung (paling mudah)**
+1. Buka Cloudflare Dashboard → **Workers & Pages** → **Create** → tab **Pages** → **Upload assets**.
+2. Beri nama proyek (mis. `kantin-uimsya-putra`), lalu **seret folder proyek** ini (isi folder, bukan file zip) → **Deploy**.
+3. Situs aktif di `https://NAMA-PROYEK.pages.dev`. Untuk memperbarui: buka proyek → **Create deployment** → upload ulang folder.
+
+**B. Lewat GitHub**
+1. Workers & Pages → Create → Pages → **Connect to Git**, pilih repositori.
+2. Framework preset: **None**. Build command: *(kosong)*. Build output directory: `/` (root).
+3. Setiap `git push` otomatis ter-deploy.
+
+**C. Lewat terminal (Wrangler)**
+```
+npx wrangler pages deploy . --project-name=kantin-uimsya-putra
+```
+
+Catatan:
+- `_headers` (header keamanan & cache) dan `_redirects` (`/login` → halaman login) dibaca otomatis oleh Cloudflare Pages.
+- Alamat `app.html` otomatis tampil sebagai `/app`, dan `index.html` sebagai `/`.
+- Cloudflare Pages **tidak** memasang pop-up/badge di halaman. Jika ada widget melayang, cek **Web Analytics** di proyek dan pastikan *auto-install* tidak diaktifkan bila tidak diperlukan.
+- Domain sendiri: proyek → **Custom domains** → Set up a domain.
+- Jika memakai domain baru, tambahkan juga ke Supabase → Authentication → URL Configuration (Site URL / Redirect URLs).
 
 ---
 
@@ -148,10 +168,9 @@ Gunakan **Publishable/anon key**, bukan service_role.
 - **Pengeluaran**: rekap per kategori + rincian, tombol *Cetak Rekap* / *Cetak Lengkap*. Kategori yang ditulis dengan huruf besar/kecil berbeda (mis. "Gas" dan "gas") digabung otomatis.
 - **Evaluasi dan Rekapitulasi**: catatan keluh kesah anggota dan target kantin, plus rekap angka periode. Catatan disimpan di tabel `kantin_data` dengan tipe `catatan` — **tidak perlu mengubah database**.
 
-## 12. Simpan PDF & Netlify Drawer
+## 12. Simpan PDF
 
 - Tombol **📄 PDF** ada di samping setiap tombol Cetak, dan **📄 Simpan PDF Semua Laporan** di tab Laporan. PDF langsung terunduh (A4, bernomor halaman). Library-nya ada di folder `vendor/` — ikut di-upload bersama file lain.
-- **Pop-up Netlify** (Netlify Drawer, panel komentar Deploy Preview): sudah diblokir lewat `netlify.toml`. Untuk mematikannya total, buka Netlify → Project configuration → Build & deploy → Continuous deployment → *Collaboration tools* → Configure → matikan Netlify Drawer.
 
 ## 13. Tampilan Dasbor Kaca (v4)
 
