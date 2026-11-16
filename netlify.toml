@@ -10,10 +10,3 @@
   from = "/login"
   to = "/index.html"
   status = 200
-
-# Matikan pop-up "Netlify Drawer" (panel komentar/feedback Deploy Preview).
-# Drawer dimuat lewat iframe app.netlify.com; dengan frame-src 'self' iframe tsb tidak dimuat.
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Content-Security-Policy = "frame-src 'self' blob: data:;"

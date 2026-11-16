@@ -15,8 +15,6 @@
     report:null,
     editId:null,
     opening:Number(localStorage.getItem('kantin_opening_balance')||0),
-    theme:'dark',
-    homeChip:'all',
     period:null,        // 'YYYY-MM' atau '' (semua periode)
     dailyPeriod:'',
     carry:true,         // evaluasi: sertakan catatan belum selesai dari periode lalu
@@ -69,10 +67,10 @@
     renderAll();
   }
   function periodStats(){
-    const s={sales:0,gross:0,titip:0,tabHarian:0,otherIn:0,expense:0,withdraw:0,saving:0,dayNet:0,opsDays:0,liburDays:0};
+    const s={sales:0,otherIn:0,expense:0,withdraw:0,saving:0,dayNet:0,opsDays:0,liburDays:0};
     state.rows.forEach(r=>{
       if(!inPeriod(r.tgl))return;const d=data(r);
-      if(r.tipe==='harian'){s.gross+=num(d.pend1)+num(d.pend2);s.titip+=num(d.titip1)+num(d.titip2)+num(d.titip3);s.tabHarian+=num(d.tabungan);s.sales+=totalDaily(d);s.saving+=num(d.tabungan);s.dayNet+=totalDaily(d);s.opsDays++;}
+      if(r.tipe==='harian'){s.sales+=num(d.pend1)+num(d.pend2);s.saving+=num(d.tabungan);s.dayNet+=totalDaily(d);s.opsDays++;}
       else if(r.tipe==='libur')s.liburDays++;
       else if(r.tipe==='pemasukan')s.otherIn+=num(d.nominal);
       else if(r.tipe==='pengeluaran')s.expense+=num(d.nominal);
@@ -139,9 +137,7 @@
     // Label user + role tag
     const uname=state.session.user.email?.split('@')[0]||'Pengguna';
     const el=$('#userLabel');
-    window.kantinUserName=uname;
-    if(el) el.innerHTML=`<span class="gd-avatar">${esc(uname.slice(0,1).toUpperCase())}</span><span class="gd-uname">${esc(uname)}</span><span class="role-tag ${admin?'admin':'kasir'}">${admin?'👑 Admin':'👤 Kasir'}</span>`;
-    if(window.updateHomeClock)window.updateHomeClock();
+    if(el) el.innerHTML=`${esc(uname)} <span class="role-tag ${admin?'admin':'kasir'}">${admin?'👑 Admin':'👤 Kasir'}</span>`;
     // Profil di pengaturan
     const su=$('#settingsUser');
     if(su) su.textContent=uname+(admin?' (Admin)':' (Kasir)');
@@ -192,8 +188,6 @@
     $$('.page').forEach(p=>p.classList.toggle('active',p.id===`tab-${tab}`));
     const titles={home:'Beranda',ringkasan:'Ringkasan',transaksi:'Transaksi',kas:'Buku Kas',harian:'Laporan Harian',piutang:'Piutang',hutang:'Hutang',persediaan:'Persediaan',pemasok:'Pemasok',tabungan:'Tabungan',laporan:'Laporan',pengguna:'Manajemen Pengguna',pengaturan:'Pengaturan',pengeluaran:'Pengeluaran',evaluasi:'Evaluasi dan Rekapitulasi'};
     $('#pageTitle').textContent=$(`[data-tab="${tab}"] span`)?.textContent||titles[tab]||tab;
-    renderTopTabs(tab);closeCmd();
-    const gc=$('#gdContent');if(gc)gc.scrollTop=0;
     if(tab==='home')renderHome();
     if(tab==='ringkasan')renderDashboard();
     if(tab==='transaksi')renderTransactions();
@@ -310,131 +304,12 @@
   }
 
   /* ── Laporan Harian ─────────────────────────────────────────────────────── */
-  /* ── Beranda (dasbor kaca) ───────────────────────────────────────────────── */
-  const NAV_GROUPS=[
-    {tabs:['home','ringkasan']},
-    {tabs:['transaksi','pengeluaran','kas','piutang','hutang','tabungan']},
-    {tabs:['harian','persediaan','pemasok']},
-    {tabs:['laporan','evaluasi']},
-    {tabs:['pengguna','pengaturan']}];
-  const TAB_LABEL={home:'Beranda',ringkasan:'Ringkasan',transaksi:'Transaksi',pengeluaran:'Pengeluaran',kas:'Buku Kas',piutang:'Piutang',hutang:'Hutang',tabungan:'Tabungan',harian:'Laporan Harian',persediaan:'Persediaan',pemasok:'Pemasok',laporan:'Laporan',evaluasi:'Evaluasi & Rekap',pengguna:'Pengguna',pengaturan:'Pengaturan'};
-  function renderTopTabs(tab){
-    const g=NAV_GROUPS.find(x=>x.tabs.includes(tab))||NAV_GROUPS[0],box=$('#gdTabs');if(!box)return;
-    box.innerHTML=g.tabs.filter(t=>t!=='pengguna'||isAdmin()).map(t=>`<button type="button" class="gd-tab${t===tab?' active':''}" data-go="${t}">${TAB_LABEL[t]}</button>`).join('');
-    $$('#gdTabs [data-go]').forEach(b=>b.onclick=()=>nav(b.dataset.go));
-    box.querySelector('.active')?.scrollIntoView({inline:'center',block:'nearest'});
-  }
-  function alertList(){
-    const out=[],today=isoToday();
-    const filled=state.rows.some(r=>(r.tipe==='harian'||r.tipe==='libur')&&r.tgl===today);
-    if(filled)out.push({kind:'ok',icon:'circle-check',title:'Laporan hari ini sudah tercatat',text:'Data penjualan hari ini aman.',tab:'harian',count:false});
-    else if(!isFriday(today))out.push({kind:'warn',icon:'clipboard-list',title:'Laporan harian hari ini belum diisi',text:'Isi pemasukan, titipan & tabungan hari ini.',tab:'harian'});
-    const low=byType('persediaan').filter(r=>num(data(r).stok)<=num(data(r).minimum));
-    if(low.length)out.push({kind:'warn',icon:'package',title:`${low.length} barang stok menipis`,text:low.slice(0,3).map(r=>data(r).nama).join(', ')+(low.length>3?' dll.':''),tab:'persediaan'});
-    const rec=receivables().filter(r=>r.balance>0),over=rec.filter(r=>r.d.jatuh_tempo&&r.d.jatuh_tempo<today);
-    if(rec.length)out.push({kind:over.length?'bad':'info',icon:'hand-coins',title:`Piutang ${fmt(rec.reduce((a,r)=>a+r.balance,0))}`,text:`${rec.length} belum lunas`+(over.length?` · ${over.length} lewat jatuh tempo`:''),tab:'piutang'});
-    const pay=payables().filter(r=>r.balance>0);
-    if(pay.length)out.push({kind:'info',icon:'receipt',title:`Hutang ${fmt(pay.reduce((a,r)=>a+r.balance,0))}`,text:`${pay.length} belum lunas`,tab:'hutang'});
-    const kel=byType('catatan').filter(r=>data(r).jenis==='keluhan'&&!noteDone(data(r)));
-    if(kel.length)out.push({kind:'info',icon:'message-square-text',title:`${kel.length} keluh kesah belum selesai`,text:'Buka Evaluasi untuk menindaklanjuti.',tab:'evaluasi'});
-    return out;
-  }
-  function updateDockBadges(list){
-    const has=t=>list.some(a=>a.tab===t&&a.count!==false&&a.kind!=='info');
-    const mark=(t,on,red)=>{const b=$(`.gd-dock-item[data-tab="${t}"]`);if(b){b.classList.toggle('has-dot',!!on);b.classList.toggle('dot-red',!!red);}};
-    mark('persediaan',has('persediaan'));mark('harian',has('harian'));
-    mark('piutang',list.some(a=>a.tab==='piutang'&&a.kind==='bad'),true);
-    mark('evaluasi',list.some(a=>a.tab==='evaluasi'));
-    const n=list.filter(a=>a.count!==false&&(a.kind==='warn'||a.kind==='bad')).length;
-    const dot=$('#bellDot');if(dot)dot.hidden=!n;
-  }
   function renderHome(){
     const st=periodStats(),savings=totalSavings();
     const mt=$('#homeMonthTitle');if(mt)mt.textContent='Ringkasan '+periodLabel();
     const pn=$('#homePeriodNote');if(pn)pn.textContent=state.period?`Menampilkan data ${monthName(state.period)} saja. Pilih "Semua Periode" untuk melihat seluruhnya.`:'Menampilkan seluruh data dari semua periode.';
     $('#homeStats').innerHTML=[[state.period?'Penjualan periode':'Total penjualan',st.sales],['Laba operasional',st.profit],['Saldo tabungan (total)',savings],['Piutang tersisa',receivableTotal()]].map(([l,v])=>`<div class="stat"><span>${l}</span><strong>${fmt(v)}</strong></div>`).join('');
-    $('#homeMonth').innerHTML=`<div class="kpi-list"><div><span>Pemasukan harian (kotor)</span><b>${fmt(st.gross)}</b></div><div><span>Titipan</span><b>− ${fmt(st.titip)}</b></div><div><span>Tabungan harian</span><b>− ${fmt(st.tabHarian)}</b></div><div><span>Penjualan</span><b>${fmt(st.sales)}</b></div><div><span>Pengeluaran</span><b>${fmt(st.expense)}</b></div><div><span>Pendapatan lain</span><b>${fmt(st.otherIn)}</b></div><div><span>Penarikan tabungan</span><b>${fmt(st.withdraw)}</b></div><div><span>Hari operasional / libur</span><b>${st.opsDays} / ${st.liburDays}</b></div></div>`;
-    // peringatan
-    const al=alertList(),n=al.filter(a=>a.count!==false&&a.kind!=='ok').length;
-    $('#alertCount').textContent=n;$('#alertCount').classList.toggle('zero',!n);
-    $('#homeAlerts').innerHTML=al.map(a=>`<button type="button" class="gd-alert ${a.kind}" data-go="${a.tab}"><span class="gd-alert-ic">${icon(a.icon,16)}</span><span><b>${esc(a.title)}</b><small>${esc(a.text)}</small></span></button>`).join('')||'<div class="gd-empty">Tidak ada peringatan 🎉</div>';
-    updateDockBadges(al);
-    // pengeluaran per kategori
-    const rec=expenseRecap(expensesInPeriod()),colors=['','gold','emerald','purple','rose'];
-    $('#homeCats').innerHTML=rec.list.slice(0,5).map((x,i)=>`<div><div class="gd-bar-top"><b>${esc(x.label)}</b><span>${fmt(x.total)} · ${x.pct.toFixed(0)}%</span></div><div class="gd-track"><div class="gd-fill ${colors[i%5]}" style="width:${x.pct.toFixed(1)}%"></div></div></div>`).join('')||'<div class="gd-empty">Belum ada pengeluaran pada periode ini.</div>';
-    // catatan
-    const notes=notesInView(false),ke=notes.filter(r=>data(r).jenis==='keluhan'),tg=notes.filter(r=>data(r).jenis==='target');
-    const keF=state.homeChip==='all'?ke:ke.filter(r=>data(r).status===state.homeChip);
-    $$('#noteChips button').forEach(b=>b.classList.toggle('active',b.dataset.chip===state.homeChip));
-    const noteHTML=r=>{const d=data(r),stt=NOTE_STATUS[d.jenis]||NOTE_STATUS.keluhan,cls=noteDone(d)?'ok':d.status===stt[0]?'bad':'partial';
-      return`<div class="gd-note ${esc(d.jenis)}" data-go="evaluasi"><div class="gd-note-top"><b>${esc(d.judul||'(tanpa judul)')}</b><span class="status ${cls}">${esc(d.status||stt[0])}</span></div>${d.isi?`<p>${esc(d.isi)}</p>`:''}<small>${d.pengaju||d.jenis==='keluhan'?'👤 '+esc(d.pengaju||'Anonim')+' · ':''}📅 ${r.tgl}${d.tenggat?' · ⏳ '+esc(d.tenggat):''}</small></div>`};
-    $('#homeKeluhan').innerHTML=keF.slice(0,4).map(noteHTML).join('')+(keF.length>4?`<button type="button" class="gd-link" data-go="evaluasi">Lihat ${keF.length-4} lainnya →</button>`:'')||'<div class="gd-empty">Belum ada keluh kesah.</div>';
-    $('#homeTargets').innerHTML=tg.slice(0,4).map(noteHTML).join('')+(tg.length>4?`<button type="button" class="gd-link" data-go="evaluasi">Lihat ${tg.length-4} lainnya →</button>`:'')||'<div class="gd-empty">Belum ada target kantin.</div>';
-    // kalender, ring, catatan terbaru
-    renderHomeCal();
-    const done=tg.filter(r=>noteDone(data(r))).length,tPct=tg.length?done/tg.length*100:0,mPct=st.sales>0?st.profit/st.sales*100:0;
-    const ring=(pct,color,k,t,c)=>{const r=30,C=2*Math.PI*r,off=C*(1-Math.max(0,Math.min(100,pct))/100);return`<div class="card gd-card gd-ring"><div class="gd-ring-svg"><svg viewBox="0 0 74 74"><circle cx="37" cy="37" r="30" fill="none" stroke="rgba(128,128,160,.24)" stroke-width="7"/><circle cx="37" cy="37" r="30" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg><b>${Math.round(pct)}%</b></div><small class="k">${k}</small><strong>${t}</strong><small class="c">${c}</small></div>`};
-    $('#homeRings').innerHTML=ring(mPct,mPct>=0?'#10b981':'#f43f5e','Margin','Laba / Penjualan',`Laba ${fmt(st.profit)}`)+ring(tPct,'#6366f1','Target','Tercapai',tg.length?`${done} dari ${tg.length} target`:'Belum ada target');
-    const last=[...byType('catatan')].sort((a,b)=>b.tgl.localeCompare(a.tgl))[0];
-    $('#homeLatest').innerHTML=last?`<div class="gd-latest-meta"><i></i>${data(last).jenis==='target'?'Target':'Keluh kesah'} · ${last.tgl}</div><h4>${esc(data(last).judul||'(tanpa judul)')}</h4><p>${esc(data(last).isi||'')}</p>`:'<div class="gd-empty">Belum ada catatan evaluasi.</div>';
-    $$('#tab-home [data-go]').forEach(b=>b.onclick=()=>nav(b.dataset.go));
-  }
-  function renderHomeCal(){
-    const base=state.period||isoToday().slice(0,7),[y,m]=base.split('-').map(Number),today=isoToday();
-    $('#calTitle').textContent=monthName(base);
-    const lead=(new Date(y,m-1,1).getDay()+6)%7,days=new Date(y,m,0).getDate(),map={};
-    state.rows.forEach(r=>{if(!r.tgl||!r.tgl.startsWith(base))return;if(r.tipe==='harian')map[r.tgl]={c:'ops',net:totalDaily(data(r))};else if(r.tipe==='libur'&&!map[r.tgl])map[r.tgl]={c:'libur'};});
-    let h=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(d=>`<div class="gd-cal-dn">${d}</div>`).join('')+'<div></div>'.repeat(lead);
-    for(let d=1;d<=days;d++){
-      const tgl=`${base}-${String(d).padStart(2,'0')}`,x=map[tgl];
-      const cls=['gd-cal-d',x?.c||'',tgl===today?'today':'',tgl>today?'future':''].filter(Boolean).join(' ');
-      h+=`<button type="button" class="${cls}" data-date="${tgl}" title="${tgl}${x?.c==='ops'?' · Operasional · '+fmt(x.net):x?.c==='libur'?' · Libur':''}">${d}</button>`;
-    }
-    $('#homeCal').innerHTML=`<div class="gd-cal-grid">${h}</div>`;
-    $$('#homeCal [data-date]').forEach(b=>b.onclick=()=>{nav('harian');$('#dailyDate').value=b.dataset.date;loadDailyForm(b.dataset.date);});
-  }
-  function shiftPeriod(delta){
-    const base=state.period||isoToday().slice(0,7),[y,m]=base.split('-').map(Number),d=new Date(y,m-1+delta,1);
-    setPeriod(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
-  }
-
-  /* ── Tema, palet perintah, dock ──────────────────────────────────────────── */
-  function applyTheme(t){
-    state.theme=t==='light'?'light':'dark';
-    const sh=$('#app');sh.classList.toggle('theme-dark',state.theme==='dark');sh.classList.toggle('theme-light',state.theme==='light');
-    $$('[data-theme-btn]').forEach(b=>b.classList.toggle('active',b.dataset.themeBtn===state.theme));
-    localStorage.setItem('kantin_theme',state.theme);
-  }
-  const toggleTheme=()=>applyTheme(state.theme==='dark'?'light':'dark');
-  let cmdSel=0,cmdList=[];
-  function cmdItems(){
-    const pages=Object.entries(TAB_LABEL).filter(([t])=>t!=='pengguna'||isAdmin()).map(([t,l])=>({label:l,hint:'Halaman',kw:`${l} ${t}`.toLowerCase(),run:()=>nav(t)}));
-    const acts=[
-      {label:'Transaksi baru',hint:'Perintah',kw:'tambah catat pemasukan transaksi baru',run:()=>openTransaction()},
-      {label:'Catat pengeluaran',hint:'Perintah',kw:'belanja pengeluaran biaya catat',run:()=>openTransaction('pengeluaran')},
-      {label:'Tarik tabungan',hint:'Perintah',kw:'tabungan penarikan tarik',run:()=>withdrawModal()},
-      {label:'Cetak semua laporan',hint:'Perintah',kw:'print cetak semua laporan',run:()=>printAll()},
-      {label:'Simpan PDF semua laporan',hint:'Perintah',kw:'pdf unduh simpan download semua laporan',run:()=>savePdf(ALL_REPORTS)},
-      {label:'Ganti tema terang / gelap',hint:'Perintah',kw:'tema gelap terang dark light mode',run:toggleTheme}];
-    return [...pages,...acts];
-  }
-  function closeCmd(){const r=$('#cmdResults');if(r)r.hidden=true;}
-  function renderCmd(){
-    const q=($('#cmdInput').value||'').toLowerCase().trim(),words=q.split(/\s+/).filter(Boolean);
-    const score=i=>{const l=i.label.toLowerCase();return words.length&&words.every(w=>new RegExp('(^|[^a-z0-9])'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).test(l))?0:words.every(w=>l.includes(w))?1:2;};
-    cmdList=cmdItems().filter(i=>words.every(w=>i.kw.includes(w))).sort((a,b)=>score(a)-score(b)).slice(0,8);
-    cmdSel=Math.min(cmdSel,Math.max(0,cmdList.length-1));
-    const box=$('#cmdResults');box.hidden=false;
-    box.innerHTML=cmdList.map((i,k)=>`<button type="button" class="${k===cmdSel?'sel':''}" data-k="${k}">${esc(i.label)}<small>${i.hint}</small></button>`).join('')||'<div class="none">Tidak ada hasil.</div>';
-    $$('#cmdResults button').forEach(b=>b.onmousedown=e=>{e.preventDefault();runCmd(+b.dataset.k)});
-  }
-  function runCmd(k){const it=cmdList[k];if(!it)return;$('#cmdInput').value='';$('#cmdInput').blur();closeCmd();it.run();}
-  function drawDock(){
-    const d=$('.gd-dock'),svg=$('.gd-dock-curve');if(!d||!svg||getComputedStyle(svg).display==='none')return;
-    const W=d.clientWidth,H=d.clientHeight;if(!W||!H)return;
-    const t=58,a=10,b=t+16,mid=(a+b)/2;
-    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-    svg.querySelector('path').setAttribute('d',`M0,0 L0,${a} C0,${mid} ${W},${mid} ${W},${b} L${W},${H-b} C${W},${H-mid} 0,${H-mid} 0,${H-a} L0,${H} Z`);
+    $('#homeMonth').innerHTML=`<div class="kpi-list"><div><span>Kas masuk dari laporan harian</span><b>${fmt(st.dayNet)}</b></div><div><span>Pengeluaran</span><b>${fmt(st.expense)}</b></div><div><span>Pendapatan lain</span><b>${fmt(st.otherIn)}</b></div><div><span>Tabungan masuk periode</span><b>${fmt(st.saving)}</b></div><div><span>Penarikan tabungan</span><b>${fmt(st.withdraw)}</b></div><div><span>Hari operasional / libur</span><b>${st.opsDays} / ${st.liburDays}</b></div></div>`;
   }
 
   function monthlySummary(months=state.months){
@@ -445,7 +320,7 @@
       const k=monthKey(r.tgl);
       if(!map[k])map[k]={key:k,sales:0,otherIn:0,expense:0,withdraw:0,saving:0,dailyNet:0};
       const x=data(r);
-      if(r.tipe==='harian'){map[k].sales+=totalDaily(x);map[k].saving+=num(x.tabungan);map[k].dailyNet+=totalDaily(x);}
+      if(r.tipe==='harian'){map[k].sales+=num(x.pend1)+num(x.pend2);map[k].saving+=num(x.tabungan);map[k].dailyNet+=totalDaily(x);}
       else if(r.tipe==='pemasukan')map[k].otherIn+=num(x.nominal);
       else if(r.tipe==='pengeluaran')map[k].expense+=num(x.nominal);
       else if(r.tipe==='penarikan')map[k].withdraw+=num(x.nominal);
@@ -689,11 +564,7 @@
     if(kind==='profit')return monthlySummary(12);
     if(kind==='receivable')return receivables();
     if(kind==='payable')return payables();
-    if(kind==='saving')return state.rows.filter(r=>inPeriod(r.tgl)).flatMap(r=>{const d=data(r);
-      if(r.tipe==='harian'&&num(d.tabungan)>0)return[{tgl:r.tgl,label:'Setoran harian',note:'Tabungan laporan harian',in:0,out:num(d.tabungan)}];
-      if(r.tipe==='setoran_tabungan')return[{tgl:r.tgl,label:'Setoran tabungan',note:d.keterangan||'',in:0,out:num(d.nominal)}];
-      if(r.tipe==='penarikan')return[{tgl:r.tgl,label:'Penarikan tabungan',note:d.keterangan||'',in:num(d.nominal),out:0}];
-      return[];});
+    if(kind==='saving')return cashEntries().filter(x=>x.source==='saving'&&inPeriod(x.tgl));
     return[];
   }
   function dateKey(v){if(!v)return 0;const s=String(v).trim();const t=Date.parse(s);if(!Number.isNaN(t))return t;const m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);if(m){let y=+m[3];if(y<100)y+=2000;return new Date(y,+m[2]-1,+m[1]).getTime()}return 0;}
@@ -701,36 +572,24 @@
 
   function renderReport(kind){
     state.report=kind;
-    const el=$('#reportPreview');
-    el.innerHTML=reportHTML(kind);
-    if(kind==='daily'){const rfEl=el.querySelector('#reportPeriodFilter');if(rfEl)rfEl.onchange=()=>{state.dailyPeriod=rfEl.value;renderReport('daily');};}
-  }
-  function reportHTML(kind){
-    const rows=sortChronological(reportData(kind),'tgl');
-    const reportNames={cash:'Buku Kas',profit:'Laba Rugi 12 Bulan',receivable:'Laporan Piutang',payable:'Laporan Hutang',saving:'Laporan Tabungan',daily:'Laporan Harian Kantin',expense:'Laporan Pengeluaran',evaluasi:'Evaluasi dan Rekapitulasi',stock:'Laporan Persediaan',supplier:'Laporan Pemasok'};
+    const el=$('#reportPreview'),rows=sortChronological(reportData(kind),'tgl');
+    const reportNames={cash:'Buku Kas',profit:'Laba Rugi 12 Bulan',receivable:'Laporan Piutang',payable:'Laporan Hutang',saving:'Laporan Tabungan',daily:'Laporan Harian Kantin',expense:'Laporan Pengeluaran',evaluasi:'Evaluasi dan Rekapitulasi'};
     const reportName=reportNames[kind]||'Laporan Keuangan';
     const generated=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
     const periodTxt=['cash','saving','expense','evaluasi'].includes(kind)?' • Periode: '+esc(periodLabel()):'';
     let body='',summary='';
     if(kind==='cash'){
       const masuk=rows.reduce((s,x)=>s+num(x.in),0),keluar=rows.reduce((s,x)=>s+num(x.out),0);
-      const mks=[...new Set(rows.map(x=>x.tgl.slice(0,7)))].sort();let tb='';
-      mks.forEach(mk=>{
-        const g=rows.filter(x=>x.tgl.startsWith(mk)),open=g[0].bal-g[0].in+g[0].out;let mi=0,mo=0;
-        tb+=`<tr class="print-month-header"><td colspan="6">📅 ${monthName(mk)} — Saldo awal ${fmt(open)}</td></tr>`;
-        g.forEach(x=>{mi+=x.in;mo+=x.out;tb+=`<tr><td>${x.tgl}</td><td>${x.label}</td><td>${esc(x.note)}</td><td class="num">${x.in?fmt(x.in):'-'}</td><td class="num">${x.out?fmt(x.out):'-'}</td><td class="num"><b>${fmt(x.bal)}</b></td></tr>`;});
-        tb+=`<tr class="print-month-subtotal"><td colspan="3"><b>Subtotal ${monthName(mk)}</b></td><td class="num"><b>${fmt(mi)}</b></td><td class="num"><b>${fmt(mo)}</b></td><td class="num"><b>${fmt(g[g.length-1].bal)}</b></td></tr>`;
-      });
-      body=`<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Sumber</th><th>Keterangan</th><th class="num">Masuk</th><th class="num">Keluar</th><th class="num">Saldo</th></tr></thead><tbody>${tb||'<tr><td colspan="6" class="empty">Belum ada data.</td></tr>'}</tbody></table></div>`;
+      body=`<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Sumber</th><th>Keterangan</th><th>Masuk</th><th>Keluar</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${x.tgl}</td><td>${x.label}</td><td>${esc(x.note)}</td><td class="num">${fmt(x.in)}</td><td class="num">${fmt(x.out)}</td></tr>`).join('')}</tbody></table></div>`;
       summary=`<div class="print-summary"><div><span>Saldo Awal</span><b>${fmt(cashPeriod().opening)}</b></div><div><span>Total Masuk</span><b>${fmt(masuk)}</b></div><div><span>Total Keluar</span><b>${fmt(keluar)}</b></div><div><span>Saldo Akhir</span><b>${fmt(cashPeriod().opening+masuk-keluar)}</b></div></div>`;
     }else if(kind==='profit'){
       const sales=rows.reduce((s,x)=>s+num(x.sales),0),other=rows.reduce((s,x)=>s+num(x.otherIn),0),expense=rows.reduce((s,x)=>s+num(x.expense),0),profit=sales+other-expense;
       body=`<div class="table-wrap"><table><thead><tr><th>Bulan</th><th>Penjualan</th><th>Pend. Lain</th><th>Beban</th><th>Laba</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${monthName(x.key)}</td><td class="num">${fmt(x.sales)}</td><td class="num">${fmt(x.otherIn)}</td><td class="num">${fmt(x.expense)}</td><td class="num">${fmt(x.sales+x.otherIn-x.expense)}</td></tr>`).join('')}</tbody></table></div>`;
       summary=`<div class="print-summary"><div><span>Total Penjualan</span><b>${fmt(sales)}</b></div><div><span>Pendapatan Lain</span><b>${fmt(other)}</b></div><div><span>Total Beban</span><b>${fmt(expense)}</b></div><div><span>Laba Bersih</span><b>${fmt(profit)}</b></div></div>`;
     }else if(kind==='daily'){
-      const prevPeriod=state.dailyPeriod||'';
+      const prevPeriod=$('#reportPeriodFilter')?.value||'';
       const periodTgl=[...byType('harian'),...byLibur()].map(r=>r.tgl.slice(0,7));
-      const periods=[...new Set([...periodTgl,...(prevPeriod?[prevPeriod]:[])])].sort().reverse();
+      const periods=[...new Set(periodTgl)].sort().reverse();
       const periodOptions='<option value="">Semua Periode</option>'+periods.map(p=>`<option value="${p}"${p===prevPeriod?' selected':''}>${monthName(p)}</option>`).join('');
       const allDates=generateFullDailyRange(prevPeriod);
       const opsAll=allDates.filter(x=>x.status==='OPERASIONAL'),liburAll=allDates.filter(x=>x.status==='LIBUR');
@@ -745,17 +604,8 @@
       });
       tbody+=`<tr class="print-grand-total"><td colspan="2"><b>TOTAL KESELURUHAN</b></td><td>${opsAll.length} ops · ${liburAll.length} libur</td><td class="num"><b>${fmt(totalPemasukan)}</b></td><td class="num"><b>${fmt(totalPengeluaran)}</b></td><td class="num"><b>${fmt(totalTabungan)}</b></td><td class="num"><b>${fmt(totalNet)}</b></td></tr>`;
       const filterBar=`<div class="period-filter-bar no-print"><span>Filter Periode:</span><select id="reportPeriodFilter">${periodOptions}</select><span class="period-info">${allDates.length} hari · ${mkList.length} bulan ditampilkan</span></div>`;
-      body=filterBar+`<div class="table-wrap"><table class="daily-full-table"><thead><tr><th>Tanggal</th><th>Hari</th><th>Status</th><th class="num">Pemasukan</th><th class="num">Pengeluaran</th><th class="num">Tabungan</th><th class="num">Penjualan</th></tr></thead><tbody>${tbody||'<tr><td colspan="7" class="empty">Belum ada data.</td></tr>'}</tbody></table></div>`;
-      summary=`<div class="print-summary wide"><div><span>Hari Operasional</span><b>${opsAll.length}</b></div><div><span>Hari Libur</span><b>${liburAll.length}</b></div><div><span>Total Pemasukan</span><b>${fmt(totalPemasukan)}</b></div><div><span>Total Pengeluaran</span><b>${fmt(totalPengeluaran)}</b></div><div><span>Total Tabungan</span><b>${fmt(totalTabungan)}</b></div><div><span>Total Penjualan</span><b>${fmt(totalNet)}</b></div></div>`;
-    }else if(kind==='stock'){
-      const items=byType('persediaan').sort((a,b)=>String(data(a).nama||'').localeCompare(String(data(b).nama||'')));
-      const val=items.reduce((a,r)=>a+num(data(r).stok)*num(data(r).harga_modal),0),low=items.filter(r=>num(data(r).stok)<=num(data(r).minimum)).length;
-      summary=`<div class="print-summary compact"><div><span>Jumlah Barang</span><b>${items.length}</b></div><div><span>Nilai Persediaan</span><b>${fmt(val)}</b></div><div><span>Stok Menipis</span><b>${low}</b></div></div>`;
-      body=`<div class="table-wrap"><table><thead><tr><th>Barang</th><th>Kategori</th><th>Supplier</th><th class="num">Harga Modal</th><th class="num">Harga Jual</th><th class="num">Stok</th><th class="num">Nilai Stok</th></tr></thead><tbody>${items.map(r=>{const d=data(r);return`<tr><td>${esc(d.nama)}</td><td>${esc(d.kategori||'-')}</td><td>${esc(d.supplier||'-')}</td><td class="num">${fmt(d.harga_modal)}</td><td class="num">${fmt(d.harga_jual)}</td><td class="num">${num(d.stok)}${num(d.stok)<=num(d.minimum)?' ⚠':''}</td><td class="num">${fmt(num(d.stok)*num(d.harga_modal))}</td></tr>`}).join('')||'<tr><td colspan="7" class="empty">Belum ada barang.</td></tr>'}${items.length?`<tr class="print-grand-total"><td colspan="6"><b>TOTAL NILAI PERSEDIAAN</b></td><td class="num">${fmt(val)}</td></tr>`:''}</tbody></table></div>`;
-    }else if(kind==='supplier'){
-      const items=byType('pemasok').sort((a,b)=>String(data(a).nama||'').localeCompare(String(data(b).nama||'')));
-      summary=`<div class="print-summary compact"><div><span>Jumlah Pemasok</span><b>${items.length}</b></div></div>`;
-      body=`<div class="table-wrap"><table><thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th>Keterangan</th></tr></thead><tbody>${items.map(r=>{const d=data(r);return`<tr><td>${esc(d.nama)}</td><td>${esc(d.kontak||'-')}</td><td class="wrap-cell">${esc(d.alamat||'-')}</td><td class="wrap-cell">${esc(d.keterangan||'-')}</td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Belum ada pemasok.</td></tr>'}</tbody></table></div>`;
+      body=filterBar+`<div class="table-wrap"><table class="daily-full-table"><thead><tr><th>Tanggal</th><th>Hari</th><th>Status</th><th class="num">Pemasukan</th><th class="num">Pengeluaran</th><th class="num">Tabungan</th><th class="num">Total</th></tr></thead><tbody>${tbody||'<tr><td colspan="7" class="empty">Belum ada data.</td></tr>'}</tbody></table></div>`;
+      summary=`<div class="print-summary wide"><div><span>Hari Operasional</span><b>${opsAll.length}</b></div><div><span>Hari Libur</span><b>${liburAll.length}</b></div><div><span>Total Pemasukan</span><b>${fmt(totalPemasukan)}</b></div><div><span>Total Pengeluaran</span><b>${fmt(totalPengeluaran)}</b></div><div><span>Total Tabungan</span><b>${fmt(totalTabungan)}</b></div><div><span>Total Bersih</span><b>${fmt(totalNet)}</b></div></div>`;
     }else if(kind==='expense'){
       const inP=expensesInPeriod(),rec=expenseRecap(inP),full=state.expMode!=='rekap',detail=full?expenseDetailRows():[];
       const catSel=$('#expCategory')?.value||'',catName=catSel?(rec.list.find(x=>x.key===catSel)?.label||''):'';
@@ -776,79 +626,12 @@
       body=`<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${x.tgl}</td><td>${x.label}</td><td>${esc(x.note)}</td><td class="num">${fmt(x.in||x.out)}</td></tr>`).join('')}</tbody></table></div>`;
       summary=`<div class="print-summary compact"><div><span>Total Setoran</span><b>${fmt(keluar)}</b></div><div><span>Total Penarikan</span><b>${fmt(masuk)}</b></div><div><span>Selisih</span><b>${fmt(keluar-masuk)}</b></div></div>`;
     }
-    return `<div class="print-sheet ${kind==='daily'?'print-wide':''}">
+    el.innerHTML=`<div class="print-sheet ${kind==='daily'?'print-wide':''}">
       <header class="print-header"><div class="print-brand-mark">KU</div><div><div class="print-kicker">KANTIN UIMSYA PUTRA</div><h3>${reportName}</h3><p>Keuangan &amp; Operasional${periodTxt}</p></div><div class="print-meta"><span>Dicetak</span><b>${generated}</b></div></header>
       <div class="print-rule"></div>${summary}${body}
       <footer class="print-footer"><span>Dokumen laporan internal • Kantin Uimsya Putra</span><span>Dicetak dari Sistem Keuangan</span></footer>
     </div>`;
-  }
-  /* ── Simpan PDF (unduh langsung, tanpa dialog cetak) ─────────────────────── */
-  const _scripts={};
-  const loadScript=src=>_scripts[src]||(_scripts[src]=new Promise((ok,fail)=>{const t=document.createElement('script');t.src=src;t.onload=ok;t.onerror=()=>{delete _scripts[src];fail(new Error('Gagal memuat '+src));};document.head.appendChild(t);}));
-  const PDF_NAMES={cash:'Buku-Kas',daily:'Laporan-Harian',receivable:'Piutang',payable:'Hutang',stock:'Persediaan',supplier:'Pemasok',saving:'Tabungan',expense:'Pengeluaran',profit:'Laba-Rugi',evaluasi:'Evaluasi-Rekapitulasi'};
-  async function savePdf(kinds,mode){
-    kinds=[].concat(kinds);
-    let fr=null;
-    try{
-      toast('Menyiapkan PDF…');
-      await Promise.all([loadScript('vendor/html2canvas.min.js'),loadScript('vendor/jspdf.umd.min.js')]);
-      const prevMode=state.expMode;if(mode)state.expMode=mode;else if(kinds.length>1)state.expMode='lengkap';
-      let html;try{html=kinds.map(reportHTML).join('');}finally{state.expMode=prevMode;}
-      // render dengan gaya cetak (putih, hitam) di iframe tersembunyi
-      const css=(await (await fetch('style.css')).text()).replace(/@media\s+print/g,'@media all');
-      const W=703;
-      fr=document.createElement('iframe');fr.setAttribute('aria-hidden','true');
-      fr.style.cssText=`position:fixed;left:-10000px;top:0;width:${W}px;height:1200px;border:0`;
-      document.body.appendChild(fr);
-      const d=fr.contentDocument;d.open();
-      d.write(`<!doctype html><html><head><meta charset="utf-8"><style>${css}</style><style>html,body{background:#fff!important;color:#111;margin:0;padding:0;width:${W}px;height:auto!important;overflow:visible!important;position:static!important;display:block!important}body::before{display:none!important}</style></head><body><div id="reportPreview">${html}</div></body></html>`);
-      d.close();
-      await new Promise(r=>setTimeout(r,400));
-      const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
-      const mx=12,my=12,mb=14,cw=210-2*mx,chH=297-my-mb;
-      let first=true;
-      for(const sh of d.querySelectorAll('.print-sheet')){
-        const canvas=await window.html2canvas(sh,{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:W});
-        const box=sh.getBoundingClientRect(),k=canvas.width/box.width,mm=cw/box.width,pageH=chH/mm;
-        // potong halaman di batas baris tabel agar tulisan tidak terbelah
-        const cuts=[...sh.querySelectorAll('tr,.print-section,.print-header,.print-summary')].map(e=>e.getBoundingClientRect().bottom-box.top).sort((a,b)=>a-b);
-        let y=0;
-        while(y<box.height-1){
-          let end=Math.min(y+pageH,box.height);
-          if(end<box.height){const ok=cuts.filter(c=>c>y+pageH*0.4&&c<=end);if(ok.length)end=ok[ok.length-1];}
-          const ph=Math.max(1,Math.round((end-y)*k)),part=document.createElement('canvas');
-          part.width=canvas.width;part.height=ph;
-          part.getContext('2d').drawImage(canvas,0,Math.round(y*k),canvas.width,ph,0,0,canvas.width,ph);
-          if(!first)pdf.addPage();first=false;
-          pdf.addImage(part.toDataURL('image/jpeg',0.92),'JPEG',mx,my,cw,(end-y)*mm);
-          y=end;
-        }
-      }
-      const n=pdf.getNumberOfPages();
-      for(let i=1;i<=n;i++){pdf.setPage(i);pdf.setFontSize(8);pdf.setTextColor(120);pdf.text('Kantin Uimsya Putra',mx,291);pdf.text(`Halaman ${i} / ${n}`,210-mx,291,{align:'right'});}
-      const per=(state.period||'Semua-Periode');
-      const name=(kinds.length>1?'Semua-Laporan':(PDF_NAMES[kinds[0]]||'Laporan')+(kinds[0]==='expense'&&mode==='rekap'?'-Rekap':''))+'_'+per+'.pdf';
-      pdf.save(name);
-      toast('PDF tersimpan: '+name);
-    }catch(e){console.error(e);toast('Gagal membuat PDF: '+(e.message||e),true);}
-    finally{if(fr)fr.remove();}
-  }
-
-  /* Cetak semua laporan sekaligus: satu laporan per halaman, urut seperti menu */
-  const ALL_REPORTS=['cash','daily','receivable','payable','stock','supplier','saving','expense','profit','evaluasi'];
-  function printAll(){
-    const prevTab=state.tab,prevReport=state.report,prevMode=state.expMode;
-    state.expMode='lengkap';
-    nav('laporan');
-    $('#reportPreview').innerHTML=ALL_REPORTS.map(reportHTML).join('');
-    const back=()=>{
-      window.removeEventListener('afterprint',back);
-      state.expMode=prevMode;
-      if(prevReport)renderReport(prevReport);else $('#reportPreview').innerHTML='';
-      if(prevTab!=='laporan')nav(prevTab);
-    };
-    window.addEventListener('afterprint',back);
-    setTimeout(()=>window.print(),300);
+    if(kind==='daily'){const rfEl=el.querySelector('#reportPeriodFilter');if(rfEl)rfEl.onchange=()=>renderReport('daily');}
   }
 
   /* ── Pengeluaran & Rekap per Kategori ────────────────────────────────────── */
@@ -1124,7 +907,7 @@
     renderAll();
   }
   function renderAll(){
-    renderPeriodSelects();renderTopTabs(state.tab||'home');
+    renderPeriodSelects();
     renderHome();renderDashboard();renderTransactions();renderExpenses();renderCash();renderDaily();renderReceivables();renderPayables();renderStock();renderSuppliers();renderSavings();renderEvaluasi();
     if(state.report)renderReport(state.report);
     if(state.tab==='pengguna')renderUsers();
@@ -1156,46 +939,6 @@
     ['trxSearch','trxType','trxFrom','trxTo'].forEach(id=>$('#'+id)?.addEventListener('input',renderTransactions));
     $('#resetTrx').onclick=()=>{['trxSearch','trxFrom','trxTo'].forEach(id=>$('#'+id).value='');$('#trxType').value='';renderTransactions()};
 
-    $('#printAllBtn').onclick=printAll;
-    $('#pdfAllBtn').onclick=()=>savePdf(ALL_REPORTS);
-    $('#pdfReportBtn').onclick=()=>state.report?savePdf(state.report):toast('Pilih salah satu laporan dulu.',true);
-    // tombol "Simpan PDF" di samping setiap tombol Cetak
-    const addPdfBtn=(btn,kind,mode)=>{const b=document.createElement('button');b.className='btn';b.textContent='📄 PDF';b.title='Simpan sebagai PDF';b.onclick=()=>savePdf(kind,mode);btn.after(b);};
-    $$('[data-print]').forEach(b=>addPdfBtn(b,b.dataset.print));
-    addPdfBtn($('#printExpenseRekap'),'expense','rekap');
-    addPdfBtn($('#printExpenseFull'),'expense','lengkap');
-    addPdfBtn($('#printEval'),'evaluasi');
-    $$('[data-print]').forEach(b=>b.addEventListener('click',()=>printKind(b.dataset.print)));
-    // dasbor kaca
-    $$('.gd-dock-item').forEach(b=>{const l=b.querySelector('.gd-dock-label');if(l)b.title=l.textContent;});
-    $('#qaAdd').onclick=()=>openTransaction();
-    $('#topAddBtn').onclick=()=>openTransaction();
-    $('#qaExpense').onclick=()=>openTransaction('pengeluaran');
-    $('#qaPrintAll').onclick=()=>printAll();
-    $('#gdPrintAll').onclick=()=>printAll();
-    $('#gdPdfAll').onclick=()=>savePdf(ALL_REPORTS);
-    $('#pdfTopBtn').onclick=()=>savePdf(ALL_REPORTS);
-    $('#qaKeluhan').onclick=()=>noteModal('keluhan');
-    $('#qaTarget').onclick=()=>noteModal('target');
-    $('#calPrev').onclick=()=>shiftPeriod(-1);
-    $('#calNext').onclick=()=>shiftPeriod(1);
-    $('#bellBtn').onclick=()=>{nav('home');setTimeout(()=>$('#alertCard')?.scrollIntoView({behavior:'smooth',block:'center'}),60);};
-    $$('#noteChips button').forEach(b=>b.onclick=()=>{state.homeChip=b.dataset.chip;renderHome();});
-    $$('[data-theme-btn]').forEach(b=>b.onclick=()=>applyTheme(b.dataset.themeBtn));
-    const ci=$('#cmdInput');
-    ci.addEventListener('focus',()=>{cmdSel=0;renderCmd();});
-    ci.addEventListener('input',()=>{cmdSel=0;renderCmd();});
-    ci.addEventListener('blur',()=>setTimeout(closeCmd,120));
-    ci.addEventListener('keydown',e=>{
-      if(e.key==='ArrowDown'){e.preventDefault();cmdSel=Math.min(cmdSel+1,cmdList.length-1);renderCmd();}
-      else if(e.key==='ArrowUp'){e.preventDefault();cmdSel=Math.max(cmdSel-1,0);renderCmd();}
-      else if(e.key==='Enter'){e.preventDefault();runCmd(cmdSel);}
-      else if(e.key==='Escape'){ci.value='';ci.blur();closeCmd();}
-    });
-    document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();ci.focus();ci.select();}});
-    window.addEventListener('resize',drawDock);
-    if(window.ResizeObserver)new ResizeObserver(drawDock).observe($('.gd-dock'));
-    drawDock();
     $$('.period-select').forEach(sel=>sel.addEventListener('change',()=>setPeriod(sel.value)));
     $('#addExpense').onclick=()=>openTransaction('pengeluaran');
     $('#printExpenseRekap').onclick=()=>printKind('expense','rekap');
@@ -1230,6 +973,7 @@
     $('#exportDash').onclick=()=>exportCSVRows(monthlySummary(state.months),'rekap-bulanan');
     $('#exportDaily').onclick=()=>exportCSVRows(byType('harian'),'laporan-harian');
     $$('.report-card').forEach(b=>b.onclick=()=>renderReport(b.dataset.report));
+    $('#mobileMenu').onclick=()=>$('.sidebar').classList.toggle('open');
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
     const dpfEl=$('#dailyPeriodFilter');
@@ -1265,7 +1009,6 @@
     if(!(await requireSession()))return;
     if(!(await loadUserRole()))return;
     applyRoleRestrictions();
-    applyTheme(localStorage.getItem('kantin_theme')||'dark');
     const savedP=localStorage.getItem('kantin_period');
     state.period=savedP===null?isoToday().slice(0,7):savedP;
     state.dailyPeriod=state.period;
