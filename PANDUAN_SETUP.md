@@ -179,3 +179,11 @@ Catatan:
 - Kolom pencarian (atau `Ctrl+K`) bisa dipakai untuk pindah halaman dan menjalankan perintah (transaksi baru, cetak semua, simpan PDF, ganti tema).
 - Beranda: peringatan otomatis (laporan hari ini belum diisi, stok menipis, piutang jatuh tempo, keluhan belum selesai), pengeluaran per kategori, keluh kesah & target, kalender periode (klik tanggal untuk membuka Laporan Harian), dan ring margin laba / target tercapai.
 - File baru: `icons.js`, `assets/bg.jpg`. Semua fungsi lama (cetak, PDF, periode, evaluasi) tetap sama.
+
+## 14. Batas Sesi Login 1 Jam
+
+- Setiap login berlaku **maksimal 1 jam**. Setelah itu pengguna otomatis keluar dan kembali ke halaman login dengan pesan "Sesi login 1 jam telah berakhir".
+- Sisa waktu tampil sebagai hitung mundur (⏱ 59:59) di bar atas. Peringatan muncul 5 menit dan 1 menit sebelum habis.
+- Berlaku untuk semua tab/jendela sekaligus. Menutup browser lalu membuka lagi setelah lewat 1 jam juga tidak otomatis masuk.
+- Mengubah lama sesi: ubah `LIMIT_MS` di `session-guard.js` (mis. `30 * 60 * 1000` untuk 30 menit).
+- Catatan keamanan: batas ini dijalankan di browser. Untuk pemaksaan di sisi server, aktifkan *Time-box user sessions* di Supabase → Authentication → Sessions (fitur paket berbayar).

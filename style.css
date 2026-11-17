@@ -130,6 +130,9 @@ body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,s
 .gd-export-btn em{font-style:normal;font-size:9px;padding:1px 4px;border-radius:4px;background:rgba(99,102,241,.2);color:#818cf8}
 .gd-primary-btn{display:flex;align-items:center;gap:6px;height:34px;padding:0 13px;border-radius:10px;background:linear-gradient(135deg,#1f1f2a,#0e0f15);color:#fff;border:1px solid rgba(255,214,0,.4);font-size:12px;font-weight:700;box-shadow:0 3px 12px rgba(0,0,0,.4),inset 0 1px 1px rgba(255,255,255,.22);transition:var(--ease)}
 .gd-primary-btn:hover{border-color:var(--gold);box-shadow:0 5px 16px var(--gold-glow),inset 0 1px 1px rgba(255,255,255,.4);transform:translateY(-1px)}
+.gd-session{display:inline-flex;align-items:center;height:34px;padding:0 11px;border-radius:10px;background:var(--badge);border:1px solid var(--border);color:var(--text2);font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
+.gd-session.warn{background:var(--warn-bg);color:var(--warn);border-color:rgba(245,158,11,.35)}
+.gd-session.crit{background:var(--danger-bg);color:var(--danger);border-color:rgba(244,63,94,.4);animation:pulse 1s infinite}
 .gd-user{display:flex;align-items:center;gap:8px;padding:3px 4px 3px 3px;border-radius:999px;background:var(--badge);border:1px solid var(--border);max-width:200px}
 .gd-avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:linear-gradient(135deg,#6366f1,#06b6d4);color:#fff;font-weight:800;font-size:12px;position:relative}
 .gd-avatar::after{content:'';position:absolute;right:-1px;bottom:-1px;width:8px;height:8px;border-radius:50%;background:#4ade80;border:2px solid #14141c;box-shadow:0 0 6px #4ade80}

@@ -87,9 +87,33 @@
   /* ── Auth & Role ─────────────────────────────────────────────────────────── */
   async function requireSession(){
     const {data,error}=await db.auth.getSession();
-    if(error||!data?.session){location.replace('index.html?error=session_expired');return false;}
+    if(error||!data?.session){KantinSession.clear();location.replace('index.html?error=session_expired');return false;}
+    if(KantinSession.isExpired(data.session)){KantinSession.expire('session_timeout');return false;}
     state.session=data.session;
+    startSessionTimer();
     return true;
+  }
+
+  /* ── Batas sesi 1 jam: hitung mundur & logout otomatis ───────────────────── */
+  let _sessTimer=null,_warned5=false,_warned1=false;
+  function checkSession(){
+    if(!state.session)return;
+    const left=KantinSession.remainingMs(state.session);
+    const el=$('#sessionTimer');
+    if(left<=0){clearInterval(_sessTimer);if(el)el.textContent='⏱ 00:00';KantinSession.expire('session_timeout');return;}
+    const sec=Math.ceil(left/1000),mm=String(Math.floor(sec/60)).padStart(2,'0'),ss=String(sec%60).padStart(2,'0');
+    if(el){el.textContent=`⏱ ${mm}:${ss}`;el.classList.toggle('warn',left<=5*60000&&left>60000);el.classList.toggle('crit',left<=60000);}
+    if(left<=5*60000&&!_warned5){_warned5=true;toast('Sesi login berakhir dalam 5 menit. Selesaikan pekerjaan Anda.');}
+    if(left<=60000&&!_warned1){_warned1=true;toast('Sesi berakhir dalam 1 menit — Anda akan keluar otomatis.',true);}
+  }
+  function startSessionTimer(){
+    if(_sessTimer)return;
+    checkSession();
+    _sessTimer=setInterval(checkSession,1000);
+    // timer di tab latar bisa tertunda → cek ulang saat tab aktif kembali
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkSession();});
+    window.addEventListener('focus',checkSession);
+    window.addEventListener('storage',e=>{if(e.key==='kantin_login_at')checkSession();});
   }
 
   async function loadUserRole(){
@@ -1209,7 +1233,7 @@
     $('#printEval').onclick=()=>printKind('evaluasi');
 
     $('#refreshBtn').onclick=()=>refresh().then(()=>toast('Data diperbarui.')).catch(e=>toast(e.message,true));
-    $('#logoutBtn').onclick=async()=>{await db.auth.signOut();location.replace('index.html')};
+    $('#logoutBtn').onclick=async()=>{KantinSession.clear();await db.auth.signOut();location.replace('index.html')};
 
     if(isAdmin()){
       $('#saveOpening').onclick=()=>{

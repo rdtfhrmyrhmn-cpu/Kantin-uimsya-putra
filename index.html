@@ -53,6 +53,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
+<script src="session-guard.js"></script>
   <script>
   (()=>{
     const form=document.getElementById('loginForm'),
@@ -67,7 +68,8 @@
     const errMap={
       no_access:'⚠️ Akun Anda belum memiliki akses. Hubungi admin untuk mendapatkan akses.',
       deactivated:'🚫 Akun Anda telah dinonaktifkan. Hubungi admin.',
-      session_expired:'🔒 Sesi berakhir. Silakan login kembali.'
+      session_expired:'🔒 Sesi berakhir. Silakan login kembali.',
+      session_timeout:'⏱️ Sesi login 1 jam telah berakhir. Silakan login kembali.'
     };
     const preErr=params.get('error');
     if(preErr&&errMap[preErr]){pre.textContent=errMap[preErr];pre.className='msg warn show';}
@@ -81,7 +83,14 @@
     const show=t=>{m.textContent=t;m.className='msg show'};
 
     supabaseClient.auth.getSession().then(({data})=>{
-      if(data.session) location.replace('app.html');
+      if(!data.session)return;
+      // Sesi lama yang sudah lewat 1 jam: keluarkan, jangan masuk otomatis
+      if(KantinSession.isExpired(data.session)){
+        KantinSession.clear();
+        supabaseClient.auth.signOut().finally(()=>{pre.textContent=errMap.session_timeout;pre.className='msg warn show';});
+        return;
+      }
+      location.replace('app.html');
     }).catch(()=>{});
 
     form.addEventListener('submit',async e=>{
@@ -95,6 +104,7 @@
       try{
         const {error}=await supabaseClient.auth.signInWithPassword({email,password});
         if(error)throw error;
+        KantinSession.markLogin();
         location.replace('app.html');
       }catch(err){
         console.error(err);
