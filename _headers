@@ -1,12 +1,9 @@
-# Cloudflare Pages — header untuk semua halaman
 /*
   X-Content-Type-Options: nosniff
-  X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
-# File statis berat: boleh di-cache lama
+# Aset statis boleh di-cache lama; HTML/JS/CSS selalu dicek ulang agar update langsung terlihat
 /assets/*
-  Cache-Control: public, max-age=604800
-/vendor/*
   Cache-Control: public, max-age=604800

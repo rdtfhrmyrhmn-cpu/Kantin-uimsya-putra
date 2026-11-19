@@ -1,194 +1,165 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#08080a">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"><meta name="theme-color" content="#08080a" id="metaTheme">
   <title>Kantin Uimsya Putra — Keuangan</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"><link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('kantin_theme')||'dark'}catch(e){}</script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="app" class="app-shell theme-dark">
-  <div class="gd-orbs" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i></div>
-  <div class="gd-console">
-    <i class="gd-chip tl" aria-hidden="true"></i><i class="gd-chip tr" aria-hidden="true"></i><i class="gd-chip bl" aria-hidden="true"></i><i class="gd-chip br" aria-hidden="true"></i>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol><symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol><symbol id="i-store" viewBox="0 0 24 24"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></symbol><symbol id="i-hand-coins" viewBox="0 0 24 24"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></symbol><symbol id="i-notebook-pen" viewBox="0 0 24 24"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/></symbol><symbol id="i-file-text" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></symbol><symbol id="i-settings" viewBox="0 0 24 24"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-log-out" viewBox="0 0 24 24"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol><symbol id="i-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol><symbol id="i-trending-up" viewBox="0 0 24 24"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></symbol><symbol id="i-trending-down" viewBox="0 0 24 24"><path d="M16 17h6v-6"/><path d="m22 17-8.5-8.5-5 5L2 7"/></symbol><symbol id="i-receipt" viewBox="0 0 24 24"><path d="M12 17V7"/><path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"/><path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"/></symbol><symbol id="i-piggy-bank" viewBox="0 0 24 24"><path d="M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z"/><path d="M16 10h.01"/><path d="M2 8v1a2 2 0 0 0 2 2h1"/></symbol><symbol id="i-package" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></symbol><symbol id="i-truck" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></symbol><symbol id="i-arrow-down-left" viewBox="0 0 24 24"><path d="M17 7 7 17"/><path d="M17 17H7V7"/></symbol><symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol><symbol id="i-banknote" viewBox="0 0 24 24"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></symbol><symbol id="i-landmark" viewBox="0 0 24 24"><path d="M10 18v-7"/><path d="M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z"/><path d="M14 18v-7"/><path d="M18 18v-7"/><path d="M3 22h18"/><path d="M6 18v-7"/></symbol><symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></symbol><symbol id="i-file-down" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol><symbol id="i-calendar-days" viewBox="0 0 24 24"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 13h.01"/><path d="M12 13h.01"/><path d="M16 13h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/><path d="M16 17h.01"/></symbol><symbol id="i-handshake" viewBox="0 0 24 24"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></symbol><symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="i-circle-user" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></symbol><symbol id="i-chart-pie" viewBox="0 0 24 24"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/></symbol><symbol id="i-clipboard-list" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></symbol><symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol></defs></svg>
+<div class="gd-orbs" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i></div>
+<div id="app" class="app-shell">
+  <div class="console">
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
 
-    <aside class="gd-dock" aria-label="Navigasi utama">
-      <svg class="gd-dock-curve" viewBox="0 0 74 640" preserveAspectRatio="none" aria-hidden="true">
+    <aside class="dock" aria-label="Navigasi utama">
+      <svg class="dock-curve" viewBox="0 0 74 640" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="dockGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1" stop-opacity=".95"/><stop offset="50%" stop-color="#4f46e5" stop-opacity=".98"/><stop offset="100%" stop-color="#3730a3" stop-opacity=".95"/></linearGradient>
           <linearGradient id="dockStroke" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity=".85"/><stop offset="35%" stop-color="#ffd600" stop-opacity=".55"/><stop offset="70%" stop-color="#fff" stop-opacity=".3"/><stop offset="100%" stop-color="#a5b4fc" stop-opacity=".5"/></linearGradient>
         </defs>
         <path d="M 0,0 L 0,20 C 0,65 74,65 74,115 L 74,525 C 74,575 0,575 0,620 L 0,640 Z" fill="url(#dockGrad)" stroke="url(#dockStroke)" stroke-width="1.2"/>
       </svg>
-      <nav class="gd-dock-stack" id="sideNav">
-        <button type="button" class="gd-dock-item" data-tab="home" data-icon-wrap ><i data-icon="layout-grid" data-size="20"></i><span class="gd-dock-label">Beranda</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="ringkasan" data-icon-wrap ><i data-icon="chart-pie" data-size="20"></i><span class="gd-dock-label">Ringkasan</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <i class="gd-dock-sep" aria-hidden="true"></i><button type="button" class="gd-dock-item" data-tab="transaksi" data-icon-wrap ><i data-icon="credit-card" data-size="20"></i><span class="gd-dock-label">Transaksi</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="pengeluaran" data-icon-wrap ><i data-icon="wallet" data-size="20"></i><span class="gd-dock-label">Pengeluaran</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="kas" data-icon-wrap ><i data-icon="book-open" data-size="20"></i><span class="gd-dock-label">Buku Kas</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="piutang" data-icon-wrap ><i data-icon="hand-coins" data-size="20"></i><span class="gd-dock-label">Piutang</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="hutang" data-icon-wrap ><i data-icon="receipt" data-size="20"></i><span class="gd-dock-label">Hutang</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="tabungan" data-icon-wrap ><i data-icon="piggy-bank" data-size="20"></i><span class="gd-dock-label">Tabungan</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <i class="gd-dock-sep" aria-hidden="true"></i><button type="button" class="gd-dock-item" data-tab="harian" data-icon-wrap ><i data-icon="clipboard-list" data-size="20"></i><span class="gd-dock-label">Laporan Harian</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="persediaan" data-icon-wrap ><i data-icon="package" data-size="20"></i><span class="gd-dock-label">Persediaan</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="pemasok" data-icon-wrap ><i data-icon="handshake" data-size="20"></i><span class="gd-dock-label">Pemasok</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <i class="gd-dock-sep" aria-hidden="true"></i><button type="button" class="gd-dock-item" data-tab="laporan" data-icon-wrap ><i data-icon="file-bar-chart" data-size="20"></i><span class="gd-dock-label">Laporan</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="evaluasi" data-icon-wrap ><i data-icon="notebook-pen" data-size="20"></i><span class="gd-dock-label">Evaluasi & Rekap</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <i class="gd-dock-sep" aria-hidden="true"></i><button type="button" class="gd-dock-item" data-tab="pengguna" data-icon-wrap id="navPengguna" style="display:none"><i data-icon="users" data-size="20"></i><span class="gd-dock-label">Pengguna</span><b class="gd-dot" aria-hidden="true"></b></button>
-        <button type="button" class="gd-dock-item" data-tab="pengaturan" data-icon-wrap ><i data-icon="settings" data-size="20"></i><span class="gd-dock-label">Pengaturan</span><b class="gd-dot" aria-hidden="true"></b></button>
-        
-      </nav>
-      <button type="button" class="gd-dock-item gd-logout" id="logoutBtn" title="Keluar"><i data-icon="log-out" data-size="19"></i><span class="gd-dock-label">Keluar</span></button>
+      <div class="dock-stack" id="dockStack"></div>
     </aside>
 
-    <main class="gd-main">
-      <header class="gd-topbar">
-        <div class="gd-brand"><span class="gd-brand-logo"><img src="assets/logo.png" alt="" onerror="this.remove()"><em>🏪</em></span><div class="gd-brand-text"><b>Kantin Uimsya Putra</b><span id="pageTitle">Beranda</span></div></div>
-        <nav class="gd-tabs" id="gdTabs" aria-label="Sub menu"></nav>
-        <div class="gd-search">
-          <i data-icon="search" data-size="15"></i>
-          <input id="cmdInput" placeholder="Cari halaman atau perintah…" autocomplete="off" aria-label="Cari halaman atau perintah">
-          <kbd>Ctrl K</kbd>
-          <div class="gd-cmd" id="cmdResults" hidden></div>
+    <main class="viewport">
+      <header class="topbar">
+        <div class="tb-brand" title="Kantin Uimsya Putra"><img src="assets/logo.png" alt="" onerror="this.parentNode.textContent='🏪'"></div>
+        <nav class="top-tabs" id="topTabs" aria-label="Halaman"></nav>
+        <div class="search-wrap">
+          <svg class="ic s-ic"><use href="#i-search"/></svg>
+          <input id="cmdInput" class="search-input" type="text" placeholder="Cari halaman atau perintah..." autocomplete="off" aria-label="Cari halaman atau perintah">
+          <span class="search-badge">Ctrl K</span>
+          <div class="cmd-results" id="cmdResults" role="listbox"></div>
         </div>
-        <div class="gd-actions">
-          <div class="gd-theme" role="group" aria-label="Tema"><button type="button" data-theme-btn="light"><i data-icon="sun" data-size="13"></i><span>Terang</span></button><button type="button" data-theme-btn="dark"><i data-icon="moon" data-size="13"></i><span>Gelap</span></button></div>
-          <button type="button" class="gd-icon-btn" id="bellBtn" title="Peringatan"><i data-icon="bell" data-size="16"></i><span class="gd-notif-dot" id="bellDot" hidden></span></button>
-          <button type="button" class="gd-icon-btn" id="refreshBtn" title="Muat ulang data"><i data-icon="refresh-cw" data-size="16"></i></button>
-          <button type="button" class="gd-export-btn" id="pdfTopBtn" title="Simpan semua laporan sebagai PDF"><i data-icon="download" data-size="15"></i><span>PDF Semua</span><em>.pdf</em></button>
-          <button type="button" class="gd-primary-btn" id="topAddBtn"><i data-icon="plus" data-size="15"></i><span>Transaksi</span></button>
-          <span class="gd-session" id="sessionTimer" title="Sisa waktu sesi login (maksimal 1 jam)">⏱ --:--</span>
-          <div class="gd-user" id="userLabel"></div>
+        <div class="top-actions">
+          <div class="theme-toggle" role="group" aria-label="Tema">
+            <button type="button" id="themeLight" title="Mode terang"><svg class="ic"><use href="#i-sun"/></svg><span>Terang</span></button>
+            <button type="button" id="themeDark" title="Mode gelap"><svg class="ic"><use href="#i-moon"/></svg><span>Gelap</span></button>
+          </div>
+          <button class="icon-sq" id="refreshBtn" title="Muat ulang data"><svg class="ic"><use href="#i-refresh-cw"/></svg></button>
+          <span class="sess-chip" id="sessChip" title="Sisa waktu sesi login (maksimal 1 jam)">⏱ --:--</span>
+          <span class="user-chip" id="userLabel">Pengguna</span>
+          <button class="icon-sq" id="logoutBtn" title="Keluar"><svg class="ic"><use href="#i-log-out"/></svg></button>
+          <button class="cta-btn" id="ctaAdd" title="Tambah transaksi"><svg class="ic"><use href="#i-plus"/></svg><span>Transaksi</span></button>
         </div>
       </header>
 
-      <div class="gd-content" id="gdContent">
+      <div class="page-scroll" id="pageScroll">
     <!-- Beranda -->
     <section class="page active" id="tab-home">
-      <div class="gd-hero">
-        <div class="gd-hero-greet">
-          <h1 class="gd-hello"><span id="homeGreeting">Halo!</span> <span class="gd-bubble">👋✨</span></h1>
-          <div class="gd-hero-sub">Bagaimana kondisi kantin hari ini?</div>
-          <p class="gd-hero-desc"><span id="homeDate">—</span> · <span id="homeClock">00:00:00</span></p>
-          <label class="gd-period"><i data-icon="calendar" data-size="15"></i><span>Periode</span><select class="period-select" id="homePeriod"></select></label>
-          <small class="gd-period-note" id="homePeriodNote"></small>
+      <div class="hero">
+        <div class="hero-text">
+          <div class="eyebrow">KANTIN UIMSYA PUTRA</div>
+          <h1 id="homeGreeting">Selamat datang 👋</h1>
+          <p class="hero-sub">Apa rencana Anda hari ini? Kelola kas, transaksi, tabungan, piutang, hutang dan operasional dalam satu tempat.</p>
         </div>
-        <div class="gd-quick-deck">
-          <button type="button" class="gd-quick dashed" id="qaAdd"><span class="gd-add-circle"><i data-icon="plus" data-size="20"></i></span><span class="gd-q-text"><b>Transaksi baru</b><small>Pemasukan / pengeluaran</small></span></button>
-          <button type="button" class="gd-quick" data-tab="harian"><span class="gd-qicon"><i data-icon="clipboard-list" data-size="18"></i></span><span class="gd-q-text"><b>Laporan Harian</b><small>Isi laporan hari ini</small></span></button>
-          <button type="button" class="gd-quick" id="qaExpense"><span class="gd-qicon"><i data-icon="wallet" data-size="18"></i></span><span class="gd-q-text"><b>Pengeluaran</b><small>Catat &amp; rekap kategori</small></span></button>
-          <button type="button" class="gd-quick hl" id="qaPrintAll"><span class="gd-qicon"><i data-icon="printer" data-size="18"></i></span><span class="gd-q-text"><b>Cetak Semua</b><small>Semua laporan sekaligus</small></span></button>
+        <div class="hero-time"><div class="clock" id="homeClock">00:00:00</div><div class="date" id="homeDate">—</div></div>
+      </div>
+      <div class="quick-grid">
+        <button class="quick" data-open="cash-in"><span class="q-ic q-green"><svg class="ic"><use href="#i-arrow-down-left"/></svg></span><span class="q-txt"><b>Pemasukan</b><small>Catat uang masuk</small></span></button>
+        <button class="quick" data-open="cash-out"><span class="q-ic q-rose"><svg class="ic"><use href="#i-arrow-up-right"/></svg></span><span class="q-txt"><b>Pengeluaran</b><small>Catat biaya</small></span></button>
+        <button class="quick" data-tab="harian"><span class="q-ic q-gold"><svg class="ic"><use href="#i-receipt"/></svg></span><span class="q-txt"><b>Laporan Harian</b><small>Input penjualan</small></span></button>
+        <button class="quick" data-open="withdraw"><span class="q-ic q-cyan"><svg class="ic"><use href="#i-piggy-bank"/></svg></span><span class="q-txt"><b>Tarik Tabungan</b><small>Ambil saldo</small></span></button>
+      </div>
+      <div class="card period-card">
+        <div class="pc-title"><b><svg class="ic"><use href="#i-calendar-days"/></svg> Periode</b><small id="periodHint">—</small></div>
+        <div class="pc-ctrl">
+          <button class="btn" id="periodPrev" title="Periode sebelumnya"><svg class="ic"><use href="#i-chevron-left"/></svg></button>
+          <select id="homePeriod" aria-label="Pilih periode"></select>
+          <button class="btn" id="periodNext" title="Periode berikutnya"><svg class="ic"><use href="#i-chevron-right"/></svg></button>
+          <button class="btn" id="periodNow">Bulan ini</button>
         </div>
       </div>
-
       <div class="stats" id="homeStats"></div>
-
-      <div class="gd-grid">
-        <div class="gd-col">
-          <div class="card gd-card" id="alertCard">
-            <div class="gd-card-h"><h3><i data-icon="bell" data-size="17"></i> Peringatan</h3><span class="gd-count" id="alertCount">0</span></div>
-            <div class="gd-alerts" id="homeAlerts"></div>
-          </div>
-          <div class="card gd-card">
-            <div class="gd-card-h"><h3><i data-icon="trending-up" data-size="17"></i> <span id="homeMonthTitle">Ringkasan Periode</span></h3><button type="button" class="gd-link" data-tab="ringkasan">Detail</button></div>
-            <div id="homeMonth"></div>
-          </div>
-          <div class="card gd-card">
-            <div class="gd-card-h"><h3><i data-icon="wallet" data-size="17"></i> Pengeluaran per Kategori</h3><button type="button" class="gd-link" data-tab="pengeluaran">Semua</button></div>
-            <div id="homeCats" class="gd-bars"></div>
-          </div>
-        </div>
-
-        <div class="gd-col">
-          <div class="card gd-card">
-            <div class="gd-card-h"><h3><i data-icon="message-square-text" data-size="17"></i> Keluh Kesah Anggota</h3><button type="button" class="gd-link" id="qaKeluhan">+ Catat</button></div>
-            <div class="gd-chips" id="noteChips"><button type="button" class="active" data-chip="all">Semua</button><button type="button" data-chip="Baru">Baru</button><button type="button" data-chip="Dibahas">Dibahas</button><button type="button" data-chip="Selesai">Selesai</button></div>
-            <div class="gd-notes" id="homeKeluhan"></div>
-          </div>
-          <div class="card gd-card">
-            <div class="gd-card-h"><h3><i data-icon="target" data-size="17"></i> Target Kantin</h3><button type="button" class="gd-link" id="qaTarget">+ Target</button></div>
-            <div class="gd-notes" id="homeTargets"></div>
-          </div>
-          <div class="gd-promo">
-            <span class="gd-promo-ic"><i data-icon="file-down" data-size="30"></i></span>
-            <h3>Laporan siap cetak</h3>
-            <p>Cetak atau simpan semua laporan (Buku Kas sampai Evaluasi) sekaligus sebagai PDF.</p>
-            <div class="gd-promo-btns"><button type="button" id="gdPrintAll"><i data-icon="printer" data-size="15"></i> Cetak</button><button type="button" id="gdPdfAll"><i data-icon="download" data-size="15"></i> Simpan PDF</button></div>
-          </div>
-        </div>
-
-        <div class="gd-col">
-          <div class="card gd-card">
-            <div class="gd-card-h"><h3><i data-icon="calendar" data-size="17"></i> <span id="calTitle">Kalender</span></h3><div class="gd-cal-nav"><button type="button" id="calPrev" aria-label="Bulan sebelumnya"><i data-icon="chevron-left" data-size="16"></i></button><button type="button" id="calNext" aria-label="Bulan berikutnya"><i data-icon="chevron-right" data-size="16"></i></button></div></div>
-            <div id="homeCal"></div>
-            <div class="gd-legend"><span><i class="d ops"></i>Operasional</span><span><i class="d libur"></i>Libur</span><span><i class="d today"></i>Hari ini</span></div>
-          </div>
-          <div class="gd-rings" id="homeRings"></div>
-          <div class="card gd-card">
-            <div class="gd-card-h"><h3><i data-icon="notebook-text" data-size="17"></i> Catatan Terbaru</h3><button type="button" class="gd-link" data-tab="evaluasi">Buka</button></div>
-            <div id="homeLatest"></div>
-          </div>
-        </div>
-      </div>
+      <div class="card"><div class="card-head"><h3 id="homeMonthTitle">Ringkasan Bulan Ini</h3><button class="link-btn" data-tab="ringkasan">Lihat detail →</button></div><div id="homeMonth"></div></div>
+      <div class="card" id="biodataCard"><div class="card-head"><h3>Biodata Kantin</h3><button class="link-btn" id="editBiodata" hidden>✎ Edit</button></div><div id="biodataBody"></div></div>
     </section>
 
     <!-- Ringkasan -->
     <section class="page" id="tab-ringkasan"><div class="section-head"><div><div class="eyebrow">DASHBOARD</div><h2>Ringkasan Keuangan</h2></div><div class="periods" id="dashPeriods"><button data-months="1" class="active">1B</button><button data-months="3">3B</button><button data-months="6">6B</button><button data-months="12">1T</button><button data-months="24">2T</button></div></div><div class="stats" id="dashStats"></div><div class="grid-2"><div class="card"><div class="card-head"><h3>Arus Keuangan per Bulan</h3></div><div class="chart" id="monthlyChart"></div></div><div class="card"><div class="card-head"><h3>Komposisi Bulan Ini</h3></div><div id="composition"></div></div></div><div class="card"><div class="card-head"><h3>Rekap Bulanan</h3><button class="btn" id="exportDash">CSV</button></div><div class="table-wrap"><table id="monthlyTable"><thead><tr><th>Bulan</th><th>Penjualan</th><th>Pendapatan Lain</th><th>Pengeluaran</th><th>Penarikan</th><th>Laba Operasional</th><th>Saldo Tabungan</th></tr></thead><tbody></tbody></table></div></div></section>
 
     <!-- Transaksi -->
-    <section class="page" id="tab-transaksi"><div class="section-head"><div><div class="eyebrow">TRANSAKSI</div><h2>Kas & Transaksi</h2></div><button class="primary" id="openTransaction">+ Transaksi</button></div><div class="card filter-card"><div class="filters"><select class="period-select" title="Periode"></select><input id="trxSearch" placeholder="Cari keterangan/kategori..."><select id="trxType"><option value="">Semua jenis</option><option value="pemasukan">Pemasukan</option><option value="pengeluaran">Pengeluaran</option><option value="transfer">Transfer</option><option value="setoran_tabungan">Setoran Tabungan</option><option value="penarikan">Penarikan</option></select><input type="date" id="trxFrom"><input type="date" id="trxTo"><button class="btn" id="resetTrx">Reset</button></div></div><div class="card"><div class="table-wrap"><table id="trxTable"><thead><tr><th>Tanggal</th><th>No. Transaksi</th><th>Jenis</th><th>Kategori</th><th>Akun</th><th>Nominal</th><th>Keterangan</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
-
-    <!-- Pengeluaran -->
-    <section class="page" id="tab-pengeluaran">
-      <div class="section-head"><div><div class="eyebrow">PENGELUARAN</div><h2>Pengeluaran & Rekap per Kategori</h2><p class="muted">Catat pengeluaran, lihat rekap tiap kategori, lalu cetak sesuai periode yang dipilih.</p></div>
-        <div class="toolbar"><button class="btn" id="printExpenseRekap">🖨️ Cetak Rekap</button><button class="btn" id="printExpenseFull">🖨️ Cetak Lengkap</button><button class="primary" id="addExpense">+ Pengeluaran</button></div></div>
-      <div class="card filter-card"><div class="filters"><select class="period-select" title="Periode"></select><input id="expSearch" placeholder="Cari keterangan/kategori..."><select id="expCategory"><option value="">Semua kategori</option></select><button class="btn" id="resetExp">Reset</button></div></div>
-      <div class="stats" id="expStats"></div>
-      <div class="card" style="margin-bottom:16px"><div class="card-head"><h3>Rekap per Kategori</h3><small class="muted">Klik baris untuk memfilter rincian</small></div><div class="table-wrap"><table id="expRekapTable"><thead><tr><th>Kategori</th><th>Transaksi</th><th>Total</th><th>%</th><th>Proporsi</th></tr></thead><tbody></tbody></table></div></div>
-      <div class="card"><div class="card-head"><h3>Rincian Pengeluaran</h3></div><div class="table-wrap"><table id="expTable"><thead><tr><th>Tanggal</th><th>No. Transaksi</th><th>Kategori</th><th>Akun</th><th>Nominal</th><th>Keterangan</th><th></th></tr></thead><tbody></tbody></table></div></div>
-    </section>
+    <section class="page" id="tab-transaksi"><div class="section-head"><div><div class="eyebrow">TRANSAKSI</div><h2>Kas & Transaksi</h2><button type="button" class="period-chip" title="Ubah periode di Beranda">📅 <span class="pc-label"></span> · ubah</button></div><button class="primary" id="openTransaction">+ Transaksi</button></div><div class="card filter-card"><div class="filters"><input id="trxSearch" placeholder="Cari keterangan/kategori..."><select id="trxType"><option value="">Semua jenis</option><option value="pemasukan">Pemasukan</option><option value="pengeluaran">Pengeluaran</option><option value="transfer">Transfer</option><option value="setoran_tabungan">Setoran Tabungan</option><option value="penarikan">Penarikan</option></select><input type="date" id="trxFrom"><input type="date" id="trxTo"><button class="btn" id="resetTrx">Reset</button></div></div><div class="card"><div class="table-wrap"><table id="trxTable"><thead><tr><th>Tanggal</th><th>No. Transaksi</th><th>Jenis</th><th>Kategori</th><th>Akun</th><th>Nominal</th><th>Keterangan</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
 
     <!-- Buku Kas -->
     <section class="page" id="tab-kas">
-      <div class="section-head"><div><div class="eyebrow">BUKU KAS</div><h2>Arus Kas</h2></div>
-        <div class="toolbar" style="align-items:flex-end"><button class="btn" data-print="cash">🖨️ Cetak</button><div class="inline-input" id="openingBalanceWrap"><label>Saldo Awal <input type="number" id="openingBalance" min="0" step="1000"></label><button class="primary" id="saveOpening">Simpan</button></div></div>
+      <div class="section-head"><div><div class="eyebrow">BUKU KAS</div><h2>Arus Kas</h2><button type="button" class="period-chip" title="Ubah periode di Beranda">📅 <span class="pc-label"></span> · ubah</button></div>
+        <div class="inline-input" id="openingBalanceWrap"><label>Saldo Awal <input type="number" id="openingBalance" min="0" step="1000"></label><button class="primary" id="saveOpening">Simpan</button></div>
       </div>
-      <div class="period-filter-bar"><span>📅 Periode:</span><select class="period-select"></select></div>
       <div class="stats" id="cashStats"></div>
       <div class="card"><div class="table-wrap"><table id="cashTable"><thead><tr><th>Tanggal</th><th>Sumber</th><th>Keterangan</th><th>Masuk</th><th>Keluar</th><th>Saldo</th></tr></thead><tbody></tbody></table></div></div>
     </section>
 
     <!-- Laporan Harian -->
-    <section class="page" id="tab-harian"><div class="section-head"><div><div class="eyebrow">MODUL KHUSUS KANTIN</div><h2>Laporan Harian</h2><p class="muted">Setiap tanggal muncul di laporan: <b>OPERASIONAL</b> jika ada transaksi, <b>LIBUR</b> jika kantin tidak beroperasi.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" data-print="daily">🖨️ Cetak</button><button class="btn" id="setHolidayBtn">📅 Tandai Libur</button><button class="primary" id="saveDaily">💾 Simpan Laporan</button></div></div><div class="card"><div class="form-grid cols-3"><label>Tanggal<input type="date" id="dailyDate"></label><label>Pendapatan I<input type="number" id="pend1" min="0"></label><label>Pendapatan II<input type="number" id="pend2" min="0"></label><label>Titipan I<input type="number" id="titip1" min="0"></label><label>Titipan II<input type="number" id="titip2" min="0"></label><label>Titipan III<input type="number" id="titip3" min="0"></label><label>Tabungan<input type="number" id="dailySaving" min="0"></label><div class="calc-box"><span>Penjualan Harian <small>(Pemasukan − Titipan − Tabungan)</small></span><strong id="dailyTotal">Rp0</strong></div></div><div class="notice" id="fridayNotice">—</div><div style="margin-top:10px;min-height:36px"><button class="btn" id="unsetHolidayBtn" style="display:none;background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#bbf7d0">✅ Ubah ke Operasional</button></div></div><div class="card"><div class="card-head"><h3>Riwayat Laporan Harian</h3><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="dailyPeriodFilter" style="min-width:170px;padding:7px 10px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:12px"><option value="">📅 Semua Periode</option></select><button class="btn" id="exportDaily">CSV</button></div></div><div class="table-wrap"><table id="dailyTable"><thead><tr><th>Tanggal</th><th>Hari</th><th>Status</th><th>Pemasukan</th><th>Pengeluaran</th><th>Tabungan</th><th>Penjualan</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
+    <section class="page" id="tab-harian"><div class="section-head"><div><div class="eyebrow">MODUL KHUSUS KANTIN</div><h2>Laporan Harian</h2><button type="button" class="period-chip" title="Ubah periode di Beranda">📅 <span class="pc-label"></span> · ubah</button><p class="muted">Setiap tanggal muncul di laporan: <b>OPERASIONAL</b> jika ada transaksi, <b>LIBUR</b> jika kantin tidak beroperasi.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" id="setHolidayBtn">📅 Tandai Libur</button><button class="primary" id="saveDaily">💾 Simpan Laporan</button></div></div><div class="card"><div class="form-grid cols-3"><label>Tanggal<input type="date" id="dailyDate"></label><label>Pendapatan I<input type="number" id="pend1" min="0"></label><label>Pendapatan II<input type="number" id="pend2" min="0"></label><label>Titipan I<input type="number" id="titip1" min="0"></label><label>Titipan II<input type="number" id="titip2" min="0"></label><label>Titipan III<input type="number" id="titip3" min="0"></label><label>Tabungan<input type="number" id="dailySaving" min="0"></label><div class="calc-box"><span>Penjualan Harian <small style="display:block;font-size:11px;margin-top:2px">Pemasukan − Titipan − Tabungan</small></span><strong id="dailyTotal">Rp0</strong></div></div><div class="notice" id="fridayNotice">—</div><div style="margin-top:10px;min-height:36px"><button class="btn" id="unsetHolidayBtn" style="display:none;background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#bbf7d0">✅ Ubah ke Operasional</button></div></div><div class="card"><div class="card-head"><h3>Riwayat Laporan Harian</h3><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="dailyPeriodFilter" style="min-width:170px;padding:7px 10px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:12px"><option value="">📅 Semua Periode</option></select><button class="btn" id="exportDaily">CSV</button></div></div><div class="table-wrap"><table id="dailyTable"><thead><tr><th>Tanggal</th><th>Hari</th><th>Status</th><th>Pemasukan</th><th>Pengeluaran</th><th>Tabungan</th><th>Penjualan Harian</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
 
     <!-- Piutang -->
-    <section class="page" id="tab-piutang"><div class="section-head"><div><div class="eyebrow">TAGIHAN</div><h2>Piutang</h2></div><div class="toolbar"><button class="btn" data-print="receivable">🖨️ Cetak</button><button class="primary" id="addPiutang">+ Piutang</button></div></div><div class="stats" id="piutangStats"></div><div class="card"><div class="table-wrap"><table id="piutangTable"><thead><tr><th>Tanggal</th><th>Pelanggan</th><th>Keterangan</th><th>Jatuh Tempo</th><th>Nominal</th><th>Terbayar</th><th>Sisa</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
+    <section class="page" id="tab-piutang"><div class="section-head"><div><div class="eyebrow">TAGIHAN</div><h2>Piutang</h2></div><button class="primary" id="addPiutang">+ Piutang</button></div><div class="stats" id="piutangStats"></div><div class="card"><div class="table-wrap"><table id="piutangTable"><thead><tr><th>Tanggal</th><th>Pelanggan</th><th>Keterangan</th><th>Jatuh Tempo</th><th>Nominal</th><th>Terbayar</th><th>Sisa</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
 
     <!-- Hutang -->
-    <section class="page" id="tab-hutang"><div class="section-head"><div><div class="eyebrow">KEWAJIBAN</div><h2>Hutang</h2></div><div class="toolbar"><button class="btn" data-print="payable">🖨️ Cetak</button><button class="primary" id="addHutang">+ Hutang</button></div></div><div class="stats" id="hutangStats"></div><div class="card"><div class="table-wrap"><table id="hutangTable"><thead><tr><th>Tanggal</th><th>Supplier</th><th>Keterangan</th><th>Jatuh Tempo</th><th>Nominal</th><th>Terbayar</th><th>Sisa</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
+    <section class="page" id="tab-hutang"><div class="section-head"><div><div class="eyebrow">KEWAJIBAN</div><h2>Hutang</h2></div><button class="primary" id="addHutang">+ Hutang</button></div><div class="stats" id="hutangStats"></div><div class="card"><div class="table-wrap"><table id="hutangTable"><thead><tr><th>Tanggal</th><th>Supplier</th><th>Keterangan</th><th>Jatuh Tempo</th><th>Nominal</th><th>Terbayar</th><th>Sisa</th><th>Status</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
 
     <!-- Persediaan -->
-    <section class="page" id="tab-persediaan"><div class="section-head"><div><div class="eyebrow">OPERASIONAL</div><h2>Persediaan</h2></div><div class="toolbar"><button class="btn" data-print="stock">🖨️ Cetak</button><button class="primary" id="addStock">+ Barang</button></div></div><div class="stats" id="stockStats"></div><div class="card"><div class="table-wrap"><table id="stockTable"><thead><tr><th>Barang</th><th>Kategori</th><th>Supplier</th><th>Harga Modal</th><th>Harga Jual</th><th>Stok</th><th>Nilai Stok</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
+    <section class="page" id="tab-persediaan"><div class="section-head"><div><div class="eyebrow">OPERASIONAL</div><h2>Persediaan</h2></div><button class="primary" id="addStock">+ Barang</button></div><div class="stats" id="stockStats"></div><div class="card"><div class="table-wrap"><table id="stockTable"><thead><tr><th>Barang</th><th>Kategori</th><th>Supplier</th><th>Harga Modal</th><th>Harga Jual</th><th>Stok</th><th>Nilai Stok</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
 
     <!-- Pemasok -->
-    <section class="page" id="tab-pemasok"><div class="section-head"><div><div class="eyebrow">MASTER DATA</div><h2>Pemasok / Supplier</h2></div><div class="toolbar"><button class="btn" data-print="supplier">🖨️ Cetak</button><button class="primary" id="addSupplier">+ Pemasok</button></div></div><div class="card"><div class="table-wrap"><table id="supplierTable"><thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th>Keterangan</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
+    <section class="page" id="tab-pemasok"><div class="section-head"><div><div class="eyebrow">MASTER DATA</div><h2>Pemasok / Supplier</h2></div><button class="primary" id="addSupplier">+ Pemasok</button></div><div class="stats" id="supplierStats"></div><div class="card filter-card"><div class="filters"><input id="supplierSearch" placeholder="🔍 Cari nama / kontak / alamat pemasok..."></div></div><div class="card"><div class="table-wrap"><table id="supplierTable"><thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th>Keterangan</th><th>Barang</th><th>Sisa Hutang</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
 
     <!-- Tabungan -->
-    <section class="page" id="tab-tabungan"><div class="section-head"><div><div class="eyebrow">SIMPANAN</div><h2>Tabungan</h2></div><div class="toolbar"><button class="btn" data-print="saving">🖨️ Cetak</button><button class="primary" id="addWithdraw">+ Penarikan</button></div></div><div class="period-filter-bar"><span>📅 Periode:</span><select class="period-select"></select></div><div class="stats" id="savingStats"></div><div class="card"><div class="table-wrap"><table id="savingTable"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
+    <section class="page" id="tab-tabungan"><div class="section-head"><div><div class="eyebrow">SIMPANAN</div><h2>Tabungan</h2></div><button class="primary" id="addWithdraw">+ Penarikan</button></div><div class="stats" id="savingStats"></div><div class="card"><div class="table-wrap"><table id="savingTable"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th><th></th></tr></thead><tbody></tbody></table></div></div></section>
+
+    <!-- Pengeluaran -->
+    <section class="page" id="tab-pengeluaran">
+      <div class="section-head">
+        <div><div class="eyebrow">BIAYA</div><h2>Pengeluaran</h2><p class="muted">Rincian biaya dan rekap per kategori pada periode terpilih.</p></div>
+        <div class="toolbar">
+          <button class="primary" id="addExpense">+ Pengeluaran</button>
+          <button class="btn" id="printExpense">🖨️ Cetak</button>
+          <button class="btn" id="pdfExpense">📄 PDF</button>
+          <button class="btn" id="csvExpense">CSV</button>
+        </div>
+      </div>
+      <div class="exp-screen">
+        <div class="card filter-card"><div class="period-filter-bar" style="margin:0"><span>Periode:</span><select id="expPeriod"></select><span class="period-info" id="expInfo"></span></div></div>
+        <div class="stats" id="expStats"></div>
+        <div class="card"><div class="card-head"><h3>Rekap per Kategori</h3></div>
+          <div class="table-wrap"><table id="expCatTable"><thead><tr><th>Kategori</th><th>Transaksi</th><th>Total</th><th>%</th><th style="width:28%">Proporsi</th></tr></thead><tbody></tbody></table></div>
+        </div>
+        <div class="card" style="margin-top:16px"><div class="card-head"><h3>Rincian Pengeluaran</h3></div>
+          <div class="table-wrap"><table id="expTable"><thead><tr><th>Tanggal</th><th>No. Transaksi</th><th>Kategori</th><th>Akun</th><th>Keterangan</th><th>Nominal</th><th></th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+      <div id="expensePrintSheet"></div>
+    </section>
+
+    <!-- Evaluasi dan Rekapitulasi (buku catatan) -->
+    <section class="page" id="tab-catatan">
+      <div class="section-head">
+        <div><div class="eyebrow">BUKU CATATAN</div><h2>Evaluasi dan Rekapitulasi</h2><button type="button" class="period-chip" title="Ubah periode di Beranda">📅 <span class="pc-label"></span> · ubah</button><p class="muted">Catat keluh kesah anggota, evaluasi, dan target kantin ke depan.</p></div>
+        <div class="toolbar"><button class="primary" id="addNote">+ Catatan Baru</button><button class="btn" id="printNotes">🖨️ Cetak</button><button class="btn" id="pdfNotes">📄 PDF</button></div>
+      </div>
+      <div class="note-screen">
+      <div class="stats" id="noteStats"></div>
+      <div class="card filter-card"><div class="filters">
+        <div class="periods" id="noteTabs">
+          <button data-kind="" class="active">Semua</button><button data-kind="keluhan">😟 Keluhan</button><button data-kind="target">🎯 Target</button><button data-kind="evaluasi">📋 Evaluasi</button><button data-kind="lain">🗒️ Lain</button>
+        </div>
+        <input id="noteSearch" placeholder="🔍 Cari judul / isi / nama anggota...">
+      </div>
+      <p class="muted" style="margin:10px 0 0;font-size:12px">Target yang belum tercapai selalu tampil walau periodenya sudah lewat, supaya tidak terlupakan.</p></div>
+      <div class="notes-grid" id="noteGrid"></div>
+      </div>
+      <div id="notePrintSheet"></div>
+    </section>
 
     <!-- Laporan -->
-    <section class="page" id="tab-laporan"><div class="section-head"><div><div class="eyebrow">LAPORAN</div><h2>Laporan Keuangan</h2></div><div class="toolbar"><button class="btn" id="printReport">🖨️ Cetak</button><button class="btn" id="pdfReportBtn">📄 Simpan PDF</button></div></div><div class="period-filter-bar no-print"><span>📅 Periode (Buku Kas, Tabungan, Pengeluaran, Evaluasi):</span><select class="period-select"></select><button class="btn" id="pdfAllBtn">📄 Simpan PDF Semua Laporan</button><button class="primary" id="printAllBtn">🖨️ Cetak Semua Laporan</button></div><div class="report-grid"><button class="report-card" data-report="cash">📒<b>Buku Kas</b><span>Arus masuk, keluar & saldo</span></button><button class="report-card" data-report="profit">📈<b>Laba Rugi</b><span>Penjualan, beban & laba operasional</span></button><button class="report-card" data-report="receivable">📝<b>Piutang</b><span>Daftar tagihan & sisa</span></button><button class="report-card" data-report="payable">📌<b>Hutang</b><span>Kewajiban & sisa</span></button><button class="report-card" data-report="saving">🏦<b>Tabungan</b><span>Setoran & penarikan</span></button><button class="report-card" data-report="daily">🧾<b>Harian Kantin</b><span>Format operasional kantin</span></button><button class="report-card" data-report="stock">📦<b>Persediaan</b><span>Daftar barang, stok & nilai</span></button><button class="report-card" data-report="supplier">🤝<b>Pemasok</b><span>Daftar supplier & kontak</span></button><button class="report-card" data-report="expense">💸<b>Pengeluaran</b><span>Rekap per kategori & rincian</span></button><button class="report-card" data-report="evaluasi">📝<b>Evaluasi & Rekapitulasi</b><span>Rekap angka, keluhan & target</span></button></div><div class="card" id="reportPreview"><div class="empty">Pilih jenis laporan untuk melihat preview.</div></div></section>
-
-    <!-- Evaluasi & Rekapitulasi -->
-    <section class="page" id="tab-evaluasi">
-      <div class="section-head"><div><div class="eyebrow">CATATAN PENGURUS</div><h2>Evaluasi dan Rekapitulasi</h2><p class="muted">Buku catatan keluh kesah anggota dan target kantin ke depan, dilengkapi rekap angka periode.</p></div>
-        <div class="toolbar"><button class="btn" id="printEval">🖨️ Cetak</button></div></div>
-      <div class="card filter-card"><div class="filters"><select class="period-select" title="Periode"></select><input id="evalSearch" placeholder="Cari catatan..."><label class="check-inline"><input type="checkbox" id="evalCarry" checked> Sertakan yang belum selesai dari periode sebelumnya</label></div></div>
-      <div class="stats" id="evalStats"></div>
-      <div class="grid-2">
-        <div class="card"><div class="card-head"><h3>🗣️ Keluh Kesah Anggota</h3><button class="primary" id="addKeluhan">+ Catat</button></div><div class="notes-list" id="notesKeluhan"></div></div>
-        <div class="card"><div class="card-head"><h3>🎯 Target Kantin ke Depan</h3><button class="primary" id="addTarget">+ Target</button></div><div class="notes-list" id="notesTarget"></div></div>
-      </div>
-    </section>
+    <section class="page" id="tab-laporan"><div class="section-head"><div><div class="eyebrow">LAPORAN</div><h2>Laporan Keuangan</h2></div><div class="toolbar"><button class="btn" id="exportPdf">📄 Ekspor PDF</button><button class="btn" id="printReport">🖨️ Cetak</button><button class="btn" id="printAllReports">🖨️ Cetak Semua Laporan</button><button class="btn" id="pdfAllReports">📄 PDF Semua Laporan</button></div></div><div class="report-grid"><button class="report-card" data-report="cash">📒<b>Buku Kas</b><span>Arus masuk, keluar & saldo</span><span class="rc-actions"><span class="rc-print" data-print="cash" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="cash" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button><button class="report-card" data-report="profit">📈<b>Laba Rugi</b><span>Penjualan, beban & laba operasional</span><span class="rc-actions"><span class="rc-print" data-print="profit" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="profit" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button><button class="report-card" data-report="receivable">📝<b>Piutang</b><span>Daftar tagihan & sisa</span><span class="rc-actions"><span class="rc-print" data-print="receivable" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="receivable" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button><button class="report-card" data-report="payable">📌<b>Hutang</b><span>Kewajiban & sisa</span><span class="rc-actions"><span class="rc-print" data-print="payable" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="payable" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button><button class="report-card" data-report="saving">🏦<b>Tabungan</b><span>Setoran & penarikan</span><span class="rc-actions"><span class="rc-print" data-print="saving" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="saving" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button><button class="report-card" data-report="daily">🧾<b>Harian Kantin</b><span>Format operasional kantin</span><span class="rc-actions"><span class="rc-print" data-print="daily" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="daily" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button><button class="report-card" data-report="expense">💸<b>Pengeluaran</b><span>Rincian biaya & rekap kategori</span><span class="rc-actions"><span class="rc-print" data-print="expense" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="expense" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button><button class="report-card" data-report="supplier">🤝<b>Pemasok</b><span>Daftar pemasok & sisa hutang</span><span class="rc-actions"><span class="rc-print" data-print="supplier" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="supplier" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button><button class="report-card" data-report="notes">🗒️<b>Evaluasi & Rekap</b><span>Keluhan, target & rekap keuangan</span><span class="rc-actions"><span class="rc-print" data-print="notes" role="button" tabindex="0" title="Cetak laporan ini langsung">🖨️ Cetak</span><span class="rc-print rc-pdf" data-pdf="notes" role="button" tabindex="0" title="Simpan laporan ini sebagai PDF">📄 PDF</span></span></button></div><div id="printAllSheet"></div><div class="card" id="reportPreview"><div class="empty">Pilih jenis laporan untuk melihat preview.</div></div></section>
 
     <!-- Manajemen Pengguna (Admin only) -->
     <section class="page" id="tab-pengguna">
@@ -236,17 +207,18 @@
         </div>
       </div>
     </section>
-      </div>
+        <footer class="site-footer" id="siteFooter"></footer>
+      </div><!-- /page-scroll -->
     </main>
-  </div>
-
+  </div><!-- /console -->
   <div id="modalRoot"></div><div id="toast" class="toast"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="supabase.js"></script>
-<script src="session-guard.js"></script>
-<script src="icons.js"></script>
+<script src="site-config.js"></script>
 <script src="home.js"></script>
 <script src="app.js"></script>
 </body>
